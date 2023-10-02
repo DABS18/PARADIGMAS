@@ -19,9 +19,9 @@ package globalAliases: (Set new
 	yourself).
 
 package setPrerequisites: #(
-	'C:\Users\IPP\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\Base\Dolphin'
-	'C:\Users\IPP\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\Base\Dolphin Message Box'
-	'C:\Users\IPP\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\MVP\Presenters\Prompters\Dolphin Prompter').
+	'C:\Users\Fringe\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\Base\Dolphin'
+	'C:\Users\Fringe\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\Base\Dolphin Message Box'
+	'C:\Users\Fringe\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\MVP\Presenters\Prompters\Dolphin Prompter').
 
 package!
 
@@ -88,7 +88,11 @@ Medico comment: ''!
 
 cargaDatos
 
-^ MessageBox notify: 'CargaDatos'!
+nombre:=(Prompter prompt: 'Ingrese el nombre').
+apellido:=(Prompter prompt: 'Ingrese el apellido').
+matricula= (Prompter prompt: 'Ingrese su matrícula').
+especialidad:=(Prompter prompt: 'Ingrese la especialidad').
+condicion:=(MessageBox confirm:'¿Está disponible??').!
 
 condicion
 
@@ -139,15 +143,31 @@ liquidacion
 menu
 |op|
 
-op:=4.
-[op=0] whileFalse: [MessageBox notify: '1 - Registrar Intervencion 
+op:='5'.
+[op='0'] whileFalse: [MessageBox notify: '1 - Registrar Intervencion 
 2 - Mostrar liquidacion
 0 - Salir' caption: 'MENU DE OPCIONES'.
-op:=(Prompter prompt: 'Ingrese una opcion') asNumber asFloat.
-op=1 ifTrue: [self registrarIntervencion].
-op=2 ifTrue: [self liquidacion].
-op=3 ifTrue: [self registrarPaciente].
-(op between: 0 and: 3) ifFalse: [op:=(Prompter prompt: 'Opcion invalida. Ingrese otra.') asNumber asFloat]
+op:=(Prompter prompt: 'Ingrese una opcion').
+(op='1') ifTrue: [self registrarIntervencion].
+(op='2') ifTrue: [self liquidacion].
+(op= '/admin') ifTrue: [self menuAdmin].
+(((op='1' or: [op='2']) or: [op='/admin']) or: [op='0']) ifFalse: [op:=(Prompter prompt: 'Opcion invalida. Ingrese otra.')]
+]
+
+!
+
+menuAdmin
+|op|
+
+op:='4'.
+[op='0'] whileFalse: [MessageBox notify: '1 - Registrar paciente
+2 - Registrar médico
+3 - Registrar intervención
+0 - Salir' caption: 'PANEL DE ADMINISTRADOR'.
+op:=(Prompter prompt: 'Ingrese una opción:').
+(op='1') ifTrue: [self registrarPaciente].
+(op= '2') ifTrue: [self registrarMedico].
+((op='1' or: [op='2']) or: [op='0']) ifFalse: [op:=(Prompter prompt: 'Opcion invalida. Ingrese otra.')]
 ]
 
 !
@@ -155,6 +175,18 @@ op=3 ifTrue: [self registrarPaciente].
 registrarIntervencion
 
 ^ MessageBox notify: 'Registrar Intervencion'!
+
+registrarMedico
+
+|rta m|
+
+rta:= true.
+
+[rta] whileTrue: [m:=Medico new.
+m cargaDatos.
+medico add: m.
+rta:= MessageBox confirm: '¿Desea ingresar otro médico?'].
+!
 
 registrarPaciente
 
@@ -176,7 +208,9 @@ validarMedico
 inicio!public! !
 liquidacion!public! !
 menu!public! !
+menuAdmin!public! !
 registrarIntervencion!public! !
+registrarMedico!public! !
 registrarPaciente!public! !
 validarMedico!public! !
 !
