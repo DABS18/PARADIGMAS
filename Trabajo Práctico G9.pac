@@ -19,9 +19,9 @@ package globalAliases: (Set new
 	yourself).
 
 package setPrerequisites: #(
-	'C:\Users\Fringe\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\Base\Dolphin'
-	'C:\Users\Fringe\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\Base\Dolphin Message Box'
-	'C:\Users\Fringe\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\MVP\Presenters\Prompters\Dolphin Prompter').
+	'..\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\Base\Dolphin'
+	'..\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\Base\Dolphin Message Box'
+	'..\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\MVP\Presenters\Prompters\Dolphin Prompter').
 
 package!
 
@@ -130,6 +130,34 @@ Sanatorio comment: ''!
 !Sanatorio categoriesForClass!Kernel-Objects! !
 !Sanatorio methodsFor!
 
+consulta
+|op|
+op:='5'.
+[op='0'] whileFalse: [(MessageBox notify: '1 - Buscar pacientes
+2 - Buscar médicos
+3. Buscar Intervenciones
+0 - Salir' caption: 'CONSULTA').
+op:=(Prompter prompt: 'Ingrese una opción').
+(op='1') ifTrue: [self consultaPaciente].
+(op='2') ifTrue: [self consultaMedico].
+(op='3') ifTrue: [self consultaIntervencion ].
+(((op='1' or: [op='2']) or: [op='0']) or:[op='0']) ifFalse: [op:=(Prompter prompt: 'Opcion invalida. Ingrese otra.')].
+]
+!
+
+consultaIntervencion
+
+^ MessageBox notify: 'Int'!
+
+consultaMedico
+
+^ MessageBox notify: 'Med'!
+
+consultaPaciente
+
+
+^ MessageBox notify: 'Pac'!
+
 inicio
 
 paciente:=OrderedCollection new.
@@ -150,8 +178,9 @@ op:='5'.
 op:=(Prompter prompt: 'Ingrese una opcion').
 (op='1') ifTrue: [self registrarIntervencion].
 (op='2') ifTrue: [self liquidacion].
+(op='3') ifTrue: [self consulta].
 (op= '/admin') ifTrue: [self menuAdmin].
-(((op='1' or: [op='2']) or: [op='/admin']) or: [op='0']) ifFalse: [op:=(Prompter prompt: 'Opcion invalida. Ingrese otra.')]
+((((op='1' or: [op='2']) or: [op='/admin']) or:[op='3']) or: [op='0']) ifFalse: [op:=(Prompter prompt: 'Opcion invalida. Ingrese otra.')]
 ]
 
 !
@@ -205,6 +234,10 @@ validarMedico
 
 ^ MessageBox notify: 'valMedico'! !
 !Sanatorio categoriesForMethods!
+consulta!public! !
+consultaIntervencion!public! !
+consultaMedico!public! !
+consultaPaciente!public! !
 inicio!public! !
 liquidacion!public! !
 menu!public! !
