@@ -19,9 +19,9 @@ package globalAliases: (Set new
 	yourself).
 
 package setPrerequisites: #(
-	'..\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\Base\Dolphin'
-	'..\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\Base\Dolphin Message Box'
-	'..\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\MVP\Presenters\Prompters\Dolphin Prompter').
+	'C:\Users\IPP\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\Base\Dolphin'
+	'C:\Users\IPP\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\Base\Dolphin Message Box'
+	'C:\Users\IPP\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\MVP\Presenters\Prompters\Dolphin Prompter').
 
 package!
 
@@ -90,7 +90,7 @@ cargaDatos
 
 nombre:=(Prompter prompt: 'Ingrese el nombre').
 apellido:=(Prompter prompt: 'Ingrese el apellido').
-matricula= (Prompter prompt: 'Ingrese su matrícula').
+matricula:= (Prompter prompt: 'Ingrese su matrícula').
 especialidad:=(Prompter prompt: 'Ingrese la especialidad').
 condicion:=(MessageBox confirm:'¿Está disponible??').!
 
@@ -100,11 +100,15 @@ condicion
 
 especialidad
 
-^ MessageBox notify: 'Especialidad'! !
+^ MessageBox notify: 'Especialidad'!
+
+muestra
+Transcript cr; show: nombre; tab; tab; show:apellido; tab;tab;show:matricula printString.! !
 !Medico categoriesForMethods!
 cargaDatos!public! !
 condicion!public! !
 especialidad!public! !
+muestra!public! !
 !
 
 Paciente guid: (GUID fromString: '{6d238f25-d0b2-42a7-9548-b835c9b80ed3}')!
@@ -120,9 +124,14 @@ apellido:=(Prompter prompt: 'Ingrese el apellido').
 obraSocial:=(MessageBox confirm:'Usted posee obra social?').
 obraSocial ifTrue: [porcCobertura:=(Prompter prompt: 'Ingrese el porcentaje de cobertura')].
 obraSocial ifFalse: [porcCobertura:=0].
-! !
+!
+
+muestra
+
+Transcript cr; show: nombre; tab; tab; show:apellido; tab;tab;show:dni printString.! !
 !Paciente categoriesForMethods!
 cargaDatos!public! !
+muestra!public! !
 !
 
 Sanatorio guid: (GUID fromString: '{bb5d2598-1dbf-4024-8299-8a84559782e8}')!
@@ -136,10 +145,10 @@ op:='5'.
 [op='0'] whileFalse: [(MessageBox notify: '1 - Buscar pacientes
 2 - Buscar médicos
 3. Buscar Intervenciones
-0 - Salir' caption: 'CONSULTA').
+0 - Volver al menú' caption: 'CONSULTA').
 op:=(Prompter prompt: 'Ingrese una opción').
 (op='1') ifTrue: [self consultaPaciente].
-(op='2') ifTrue: [self consultaMedico].
+(op='2') ifTrue: [self listar: medico ].
 (op='3') ifTrue: [self consultaIntervencion ].
 (((op='1' or: [op='2']) or: [op='0']) or:[op='0']) ifFalse: [op:=(Prompter prompt: 'Opcion invalida. Ingrese otra.')].
 ]
@@ -151,12 +160,27 @@ consultaIntervencion
 
 consultaMedico
 
-^ MessageBox notify: 'Med'!
+|mat m|
+
+[m isNil] whileTrue:[
+mat:=Prompter prompt: 'Ingrese el número de legajo del alumno'.
+m:= medico detect:[:i | i matricula=mat]
+ifNone:[ MessageBox notify: 'Incorrecto. Vuelva a ingresar legajo.'. m:= nil]].
+
+m muestra.
+
+ !
 
 consultaPaciente
 
+|pac p|
 
-^ MessageBox notify: 'Pac'!
+[p isNil] whileTrue:[
+pac:=Prompter prompt: 'Ingrese el número de legajo del alumno'.
+p:= paciente detect:[:i | i dni=pac ]
+ifNone:[ MessageBox notify: 'Incorrecto. Vuelva a ingresar legajo.'. p:= nil]].
+
+p muestra.!
 
 inicio
 
@@ -168,12 +192,17 @@ liquidacion
 
 ^ MessageBox notify: 'liquidacion'!
 
+listar: coleccion
+Transcript cr;show: 'NOMBRE';tab;show:'LEGAJO';tab;show:'NOTA';cr.
+coleccion do: [:each | each muestra ]!
+
 menu
 |op|
 
 op:='5'.
 [op='0'] whileFalse: [MessageBox notify: '1 - Registrar Intervencion 
 2 - Mostrar liquidacion
+3. Consultas
 0 - Salir' caption: 'MENU DE OPCIONES'.
 op:=(Prompter prompt: 'Ingrese una opcion').
 (op='1') ifTrue: [self registrarIntervencion].
@@ -192,7 +221,7 @@ op:='4'.
 [op='0'] whileFalse: [MessageBox notify: '1 - Registrar paciente
 2 - Registrar médico
 3 - Registrar intervención
-0 - Salir' caption: 'PANEL DE ADMINISTRADOR'.
+0 - Volver al menú' caption: 'PANEL DE ADMINISTRADOR'.
 op:=(Prompter prompt: 'Ingrese una opción:').
 (op='1') ifTrue: [self registrarPaciente].
 (op= '2') ifTrue: [self registrarMedico].
@@ -240,6 +269,7 @@ consultaMedico!public! !
 consultaPaciente!public! !
 inicio!public! !
 liquidacion!public! !
+listar:!public! !
 menu!public! !
 menuAdmin!public! !
 registrarIntervencion!public! !
