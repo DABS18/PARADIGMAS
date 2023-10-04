@@ -19,9 +19,9 @@ package globalAliases: (Set new
 	yourself).
 
 package setPrerequisites: #(
-	'C:\Users\IPP\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\Base\Dolphin'
-	'C:\Users\IPP\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\Base\Dolphin Message Box'
-	'C:\Users\IPP\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\MVP\Presenters\Prompters\Dolphin Prompter').
+	'C:\Users\Fringe\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\Base\Dolphin'
+	'C:\Users\Fringe\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\Base\Dolphin Message Box'
+	'C:\Users\Fringe\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\MVP\Presenters\Prompters\Dolphin Prompter').
 
 package!
 
@@ -102,12 +102,26 @@ especialidad
 
 ^ MessageBox notify: 'Especialidad'!
 
+matricula
+^matricula!
+
 muestra
-Transcript cr; show: nombre; tab; tab; show:apellido; tab;tab;show:matricula printString.! !
+Transcript cr; show: nombre; tab; tab; show:apellido; tab;tab;show:matricula printString.
+
+(MessageBox notify: 'PROFESIONAL		', nombre, ' ', apellido, '
+',
+'MATRÍCULA		', matricula, '
+',
+'ESPECIALIDAD		', especialidad ,'
+','
+', 
+(condicion ifTrue: ['	  ✔️ Disponible '] ifFalse: ['	  ❌No disponible ']) caption:'Resultado encontrado'
+)! !
 !Medico categoriesForMethods!
 cargaDatos!public! !
 condicion!public! !
 especialidad!public! !
+matricula!public! !
 muestra!public! !
 !
 
@@ -126,11 +140,19 @@ obraSocial ifTrue: [porcCobertura:=(Prompter prompt: 'Ingrese el porcentaje de c
 obraSocial ifFalse: [porcCobertura:=0].
 !
 
+dni
+^dni!
+
 muestra
 
-Transcript cr; show: nombre; tab; tab; show:apellido; tab;tab;show:dni printString.! !
+Transcript cr; show: nombre; tab; tab; show:apellido; tab;tab;show:dni printString.
+(MessageBox notify: 'Nombre: ', nombre,
+'Apellido: ', apellido,
+'Matrícula: ', dni caption:'Resultado encontrado'
+)! !
 !Paciente categoriesForMethods!
 cargaDatos!public! !
+dni!public! !
 muestra!public! !
 !
 
@@ -148,7 +170,7 @@ op:='5'.
 0 - Volver al menú' caption: 'CONSULTA').
 op:=(Prompter prompt: 'Ingrese una opción').
 (op='1') ifTrue: [self consultaPaciente].
-(op='2') ifTrue: [self listar: medico ].
+(op='2') ifTrue: [self consultaMedico].
 (op='3') ifTrue: [self consultaIntervencion ].
 (((op='1' or: [op='2']) or: [op='0']) or:[op='0']) ifFalse: [op:=(Prompter prompt: 'Opcion invalida. Ingrese otra.')].
 ]
@@ -163,11 +185,11 @@ consultaMedico
 |mat m|
 
 [m isNil] whileTrue:[
-mat:=Prompter prompt: 'Ingrese el número de legajo del alumno'.
+mat:=Prompter prompt: 'Ingrese la matrícula del profesional'.
 m:= medico detect:[:i | i matricula=mat]
-ifNone:[ MessageBox notify: 'Incorrecto. Vuelva a ingresar legajo.'. m:= nil]].
+ifNone:[ MessageBox notify: 'Incorrecto. Vuelva a ingresar legajo o escriba SALIR para regresar al menú.'. m:= nil. ((mat='0') ifTrue: [m:='3']) ]].
 
-m muestra.
+(m isNil) ifFalse: [m muestra].
 
  !
 
