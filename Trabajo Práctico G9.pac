@@ -92,7 +92,7 @@ nombre:=(Prompter prompt: 'Ingrese el nombre').
 apellido:=(Prompter prompt: 'Ingrese el apellido').
 matricula:= (Prompter prompt: 'Ingrese su matrícula').
 especialidad:=(Prompter prompt: 'Ingrese la especialidad').
-condicion:=(MessageBox confirm:'¿Está disponible??').!
+condicion:=(MessageBox confirm:'¿Está disponible?').!
 
 condicion
 
@@ -135,8 +135,8 @@ cargaDatos
 dni:= (Prompter prompt: 'Ingrese el DNI').
 nombre:=(Prompter prompt: 'Ingrese el nombre').
 apellido:=(Prompter prompt: 'Ingrese el apellido').
-obraSocial:=(MessageBox confirm:'Usted posee obra social?').
-obraSocial ifTrue: [porcCobertura:=(Prompter prompt: 'Ingrese el porcentaje de cobertura')].
+obraSocial:=(MessageBox confirm:'¿Usted posee obra social?').
+obraSocial ifTrue: [porcCobertura:=(Prompter prompt: 'Ingrese el porcentaje de cobertura') asNumber asFloat].
 obraSocial ifFalse: [porcCobertura:=0].
 !
 
@@ -146,10 +146,15 @@ dni
 muestra
 
 Transcript cr; show: nombre; tab; tab; show:apellido; tab;tab;show:dni printString.
-(MessageBox notify: 'Nombre: ', nombre,
-'Apellido: ', apellido,
-'Matrícula: ', dni caption:'Resultado encontrado'
-)! !
+(MessageBox notify: 'PACIENTE		', nombre, ' ', apellido, '
+',
+'DNI			', dni, '
+',
+'COBERTURA		', porcCobertura printString , '%' ,'
+','
+', 
+(obraSocial ifTrue: ['	✔️ Posee Obra Social  '] ifFalse: ['	❌ No tiene Obra Social ']) caption:'Resultado encontrado'
+) ! !
 !Paciente categoriesForMethods!
 cargaDatos!public! !
 dni!public! !
@@ -187,7 +192,7 @@ consultaMedico
 [m isNil] whileTrue:[
 mat:=Prompter prompt: 'Ingrese la matrícula del profesional'.
 m:= medico detect:[:i | i matricula=mat]
-ifNone:[ MessageBox notify: 'Incorrecto. Vuelva a ingresar legajo o escriba SALIR para regresar al menú.'. m:= nil. ((mat='0') ifTrue: [m:='3']) ]].
+ifNone:[ MessageBox notify: 'Incorrecto. Vuelva a ingresar legajo o escriba SALIR para regresar al menú.'. m:= nil. ((mat='SALIR') ifTrue: [m:='3']) ]].
 
 (m isNil) ifFalse: [m muestra].
 
@@ -198,11 +203,11 @@ consultaPaciente
 |pac p|
 
 [p isNil] whileTrue:[
-pac:=Prompter prompt: 'Ingrese el número de legajo del alumno'.
+pac:=Prompter prompt: 'Ingrese el DNI del paciente'.
 p:= paciente detect:[:i | i dni=pac ]
-ifNone:[ MessageBox notify: 'Incorrecto. Vuelva a ingresar legajo.'. p:= nil]].
+ifNone:[ MessageBox notify: 'Incorrecto. Vuelva a ingresar el DNI o escriba SALIR para regresar al menú.'. p:= nil. ((pac='SALIR') ifTrue: [p:='3'])]].
 
-p muestra.!
+(p isNil) ifFalse: [p muestra].!
 
 inicio
 
