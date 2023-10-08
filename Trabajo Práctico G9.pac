@@ -116,13 +116,21 @@ Transcript cr; show: nombre; tab; tab; show:apellido; tab;tab;show:matricula pri
 ','
 ', 
 (condicion ifTrue: ['	  ✔️ Disponible '] ifFalse: ['	  ❌No disponible ']) caption:'Resultado encontrado'
-)! !
+)!
+
+precargaDatos: unaMatricula y: unNombre y: unApellido y: unaEspecialidad y: unaCondicion
+matricula:= unaMatricula.
+nombre:=unNombre.
+apellido:=unApellido.
+especialidad:=unaEspecialidad.
+condicion:=unaCondicion.! !
 !Medico categoriesForMethods!
 cargaDatos!public! !
 condicion!public! !
 especialidad!public! !
 matricula!public! !
 muestra!public! !
+precargaDatos:y:y:y:y:!public! !
 !
 
 Paciente guid: (GUID fromString: '{6d238f25-d0b2-42a7-9548-b835c9b80ed3}')!
@@ -130,14 +138,17 @@ Paciente comment: ''!
 !Paciente categoriesForClass!Kernel-Objects! !
 !Paciente methodsFor!
 
-cargaDatos
+apellido
+^apellido!
 
-dni:= (Prompter prompt: 'Ingrese el DNI').
+cargaDatos
+|ob|
+dni := (Prompter prompt: 'Ingrese el DNI').
 nombre:=(Prompter prompt: 'Ingrese el nombre').
 apellido:=(Prompter prompt: 'Ingrese el apellido').
-obraSocial:=(MessageBox confirm:'¿Usted posee obra social?').
-obraSocial ifTrue: [porcCobertura:=(Prompter prompt: 'Ingrese el porcentaje de cobertura') asNumber asFloat].
-obraSocial ifFalse: [porcCobertura:=0].
+ob:=(MessageBox confirm:'¿Usted posee obra social?').
+ob ifTrue: [obraSocial:=(Prompter prompt: 'Ingrese el nombre de su obra social'). porcCobertura:=(Prompter prompt: 'Ingrese el porcentaje de cobertura') asNumber asFloat].
+ob ifFalse: [obraSocial:='No posee Obra Social'. porcCobertura:=0].
 !
 
 dni
@@ -148,17 +159,30 @@ muestra
 Transcript cr; show: nombre; tab; tab; show:apellido; tab;tab;show:dni printString.
 (MessageBox notify: 'PACIENTE		', nombre, ' ', apellido, '
 ',
-'DNI			', dni, '
+'DNI		', dni, '
 ',
-'COBERTURA		', porcCobertura printString , '%' ,'
+'COBERTURA	', porcCobertura printString , '%' ,'
 ','
 ', 
-(obraSocial ifTrue: ['	✔️ Posee Obra Social  '] ifFalse: ['	❌ No tiene Obra Social ']) caption:'Resultado encontrado'
-) ! !
+((obraSocial='No posee Obra Social') ifFalse: ['        ✔️ ', obraSocial, '' ] ifTrue: ['    ❌ No tiene Obra Social ']) caption:'Resultado encontrado'
+) !
+
+nombre
+^nombre!
+
+precargaDatos: unDni y: unNombre y: unApellido y: unaOb y: unPorc
+dni:= unDni.
+nombre:=unNombre.
+apellido:=unApellido.
+obraSocial:=unaOb.
+porcCobertura:= unPorc.! !
 !Paciente categoriesForMethods!
+apellido!public! !
 cargaDatos!public! !
 dni!public! !
 muestra!public! !
+nombre!public! !
+precargaDatos:y:y:y:y:!public! !
 !
 
 Sanatorio guid: (GUID fromString: '{bb5d2598-1dbf-4024-8299-8a84559782e8}')!
@@ -209,11 +233,49 @@ ifNone:[ MessageBox notify: 'Incorrecto. Vuelva a ingresar el DNI o escriba SALI
 
 (p isNil) ifFalse: [p muestra].!
 
+existeDNI: unDNI
+|pac p|
+
+[p isNil] whileTrue:[
+pac:=unDNI.
+p:= paciente detect:[:i | i dni=pac ]
+ifNone:[ MessageBox notify: 'Incorrecto. Vuelva a ingresar el DNI'. p:= nil.]].
+
+^true!
+
 inicio
 
 paciente:=OrderedCollection new.
 medico:=OrderedCollection new.
-intervencion:=OrderedCollection new.!
+intervencion:=OrderedCollection new.
+
+
+paciente add: (( Paciente new)
+    precargaDatos: '01' y: 'Joel' y: 'Marchesa' y: 'Swiss Medical' y: 10
+    yourself).
+
+paciente add: (( Paciente new)
+    precargaDatos: '02' y: 'Tomas' y: 'Messa' y: 'No posee Obra Social' y: 0
+    yourself).
+paciente add: (( Paciente new)
+    precargaDatos: '01' y: 'Joel' y: 'Marchesa' y: 'Swiss Medical' y: 10
+    yourself).
+
+paciente add: (( Paciente new)
+    precargaDatos: '03' y: 'Ulises' y: 'Gutiérrez' y: 'Obra Social: OSDE' y: 15
+    yourself).
+
+medico add: (( Medico new)
+    precargaDatos: '01' y: 'Ramón' y: 'Pascual' y: 'Cardiología' y: true
+    yourself).
+
+medico add: (( Medico new)
+    precargaDatos: '02' y: 'Valentín' y: 'Vidente' y: 'Oftalmología' y: true
+    yourself).
+
+medico add: (( Medico new)
+    precargaDatos: '03' y: 'Roberto' y: 'Neuross' y: 'Neurología' y: true
+    yourself).!
 
 liquidacion
 
@@ -288,12 +350,16 @@ rta:= MessageBox confirm: 'Desea ingresar otro paciente?'].
 
 validarMedico
 
-^ MessageBox notify: 'valMedico'! !
+^ MessageBox notify: 'valMedico'!
+
+validarPaciente
+! !
 !Sanatorio categoriesForMethods!
 consulta!public! !
 consultaIntervencion!public! !
 consultaMedico!public! !
 consultaPaciente!public! !
+existeDNI:!public! !
 inicio!public! !
 liquidacion!public! !
 listar:!public! !
@@ -303,6 +369,7 @@ registrarIntervencion!public! !
 registrarMedico!public! !
 registrarPaciente!public! !
 validarMedico!public! !
+validarPaciente!public! !
 !
 
 AltaComplejidad guid: (GUID fromString: '{a632a6b3-501a-4a70-abee-034483a530bc}')!
