@@ -141,14 +141,17 @@ Paciente comment: ''!
 apellido
 ^apellido!
 
-cargaDatos
-|ob|
-dni := (Prompter prompt: 'Ingrese el DNI').
+cargaDatos"
+|ob cod cli |
+
+cod:=true
+
+cod whileTrue: [dni:=Prompter prompt: 'Ingrese el DNI'. cod:=(existeDNI: dni)].
 nombre:=(Prompter prompt: 'Ingrese el nombre').
 apellido:=(Prompter prompt: 'Ingrese el apellido').
 ob:=(MessageBox confirm:'¿Usted posee obra social?').
 ob ifTrue: [obraSocial:=(Prompter prompt: 'Ingrese el nombre de su obra social'). porcCobertura:=(Prompter prompt: 'Ingrese el porcentaje de cobertura') asNumber asFloat].
-ob ifFalse: [obraSocial:='No posee Obra Social'. porcCobertura:=0].
+ob ifFalse: [obraSocial:='No posee Obra Social'. porcCobertura:=0]. "
 !
 
 dni
@@ -234,14 +237,11 @@ ifNone:[ MessageBox notify: 'Incorrecto. Vuelva a ingresar el DNI o escriba SALI
 (p isNil) ifFalse: [p muestra].!
 
 existeDNI: unDNI
-|pac p|
-
-[p isNil] whileTrue:[
-pac:=unDNI.
-p:= paciente detect:[:i | i dni=pac ]
-ifNone:[ MessageBox notify: 'Incorrecto. Vuelva a ingresar el DNI'. p:= nil.]].
-
-^true!
+| p pac|
+pac:= unDNI.
+p:= paciente detect:[:i | i dni=pac] ifNone:[p:= 'no'.].
+(p='no') ifTrue: [^false] ifFalse: [^true ]
+!
 
 inicio
 
