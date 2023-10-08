@@ -86,11 +86,11 @@ Medico comment: ''!
 !Medico categoriesForClass!Kernel-Objects! !
 !Medico methodsFor!
 
-cargaDatos
+cargaDatos: unaMatricula
 
+matricula:=unaMatricula.
 nombre:=(Prompter prompt: 'Ingrese el nombre').
 apellido:=(Prompter prompt: 'Ingrese el apellido').
-matricula:= (Prompter prompt: 'Ingrese su matrícula').
 especialidad:=(Prompter prompt: 'Ingrese la especialidad').
 condicion:=(MessageBox confirm:'¿Está disponible?').!
 
@@ -125,7 +125,7 @@ apellido:=unApellido.
 especialidad:=unaEspecialidad.
 condicion:=unaCondicion.! !
 !Medico categoriesForMethods!
-cargaDatos!public! !
+cargaDatos:!public! !
 condicion!public! !
 especialidad!public! !
 matricula!public! !
@@ -141,17 +141,15 @@ Paciente comment: ''!
 apellido
 ^apellido!
 
-cargaDatos"
-|ob cod cli |
+cargaDatos: unDni
 
-cod:=true
-
-cod whileTrue: [dni:=Prompter prompt: 'Ingrese el DNI'. cod:=(existeDNI: dni)].
+|ob|
+dni:=unDni.
 nombre:=(Prompter prompt: 'Ingrese el nombre').
 apellido:=(Prompter prompt: 'Ingrese el apellido').
 ob:=(MessageBox confirm:'¿Usted posee obra social?').
 ob ifTrue: [obraSocial:=(Prompter prompt: 'Ingrese el nombre de su obra social'). porcCobertura:=(Prompter prompt: 'Ingrese el porcentaje de cobertura') asNumber asFloat].
-ob ifFalse: [obraSocial:='No posee Obra Social'. porcCobertura:=0]. "
+ob ifFalse: [obraSocial:='No posee Obra Social'. porcCobertura:=0].
 !
 
 dni
@@ -181,7 +179,7 @@ obraSocial:=unaOb.
 porcCobertura:= unPorc.! !
 !Paciente categoriesForMethods!
 apellido!public! !
-cargaDatos!public! !
+cargaDatos:!public! !
 dni!public! !
 muestra!public! !
 nombre!public! !
@@ -243,6 +241,12 @@ p:= paciente detect:[:i | i dni=pac] ifNone:[p:= 'no'.].
 (p='no') ifTrue: [^false] ifFalse: [^true ]
 !
 
+existeMatricula: unaMatricula
+| m med|
+med:= unaMatricula.
+m:= medico detect:[:i | i matricula=med] ifNone:[m:= 'no'.].
+(m='no') ifTrue: [^false] ifFalse: [^true ]!
+
 inicio
 
 paciente:=OrderedCollection new.
@@ -274,7 +278,7 @@ medico add: (( Medico new)
     yourself).
 
 medico add: (( Medico new)
-    precargaDatos: '03' y: 'Roberto' y: 'Neuross' y: 'Neurología' y: true
+    precargaDatos: '03' y: 'Roberto' y: 'Neuross' y: 'Neurología' y: false
     yourself).!
 
 liquidacion
@@ -325,28 +329,37 @@ registrarIntervencion
 
 registrarMedico
 
-|rta m|
+|rta m matricula|
 
 rta:= true.
 
-[rta] whileTrue: [m:=Medico new.
-m cargaDatos.
-medico add: m.
-rta:= MessageBox confirm: '¿Desea ingresar otro médico?'].
+[rta] whileTrue: [
+    matricula := (Prompter prompt: 'Ingrese la matrícula').
+    (self existeMatricula: matricula) ifTrue: [
+        MessageBox notify: 'La matrícula ya existe. Por favor, ingrese otra.'.
+    ] ifFalse: [
+        m:= Medico new.
+        m cargaDatos: matricula .
+        medico add: m.
+        rta:= MessageBox confirm: 'Desea ingresar otro paciente?'
+    ]].
 !
 
 registrarPaciente
-
-|rta p|
+|rta p dni|
 
 rta:= true.
 
-[rta] whileTrue: [p:=Paciente new.
-p cargaDatos.
-paciente add: p.
-rta:= MessageBox confirm: 'Desea ingresar otro paciente?'].
-
-!
+[rta] whileTrue: [
+    dni := (Prompter prompt: 'Ingrese DNI').
+    (self existeDNI: dni) ifTrue: [
+        MessageBox notify: 'El DNI ya existe. Por favor, ingrese otro.'.
+    ] ifFalse: [
+        p:= Paciente new.
+        p cargaDatos: dni .
+        paciente add: p.
+        rta:= MessageBox confirm: 'Desea ingresar otro paciente?'
+    ]].!
 
 validarMedico
 
@@ -360,6 +373,7 @@ consultaIntervencion!public! !
 consultaMedico!public! !
 consultaPaciente!public! !
 existeDNI:!public! !
+existeMatricula:!public! !
 inicio!public! !
 liquidacion!public! !
 listar:!public! !
