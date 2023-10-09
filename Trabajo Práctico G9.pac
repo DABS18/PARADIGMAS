@@ -20,9 +20,9 @@ package globalAliases: (Set new
 	yourself).
 
 package setPrerequisites: #(
-	'C:\Users\IPP\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\Base\Dolphin'
-	'C:\Users\IPP\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\Base\Dolphin Message Box'
-	'C:\Users\IPP\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\MVP\Presenters\Prompters\Dolphin Prompter').
+	'C:\Users\Fringe\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\Base\Dolphin'
+	'C:\Users\Fringe\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\Base\Dolphin Message Box'
+	'C:\Users\Fringe\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\MVP\Presenters\Prompters\Dolphin Prompter').
 
 package!
 
@@ -75,37 +75,47 @@ Intervencion comment: ''!
 !Intervencion categoriesForClass!Kernel-Objects! !
 !Intervencion methodsFor!
 
+arancel
+^arancel!
+
 cargaDatos: unCod
 
 
 codigo:=unCod.
 descripcion:=(Prompter prompt: 'Ingrese la descripcion').
 especialidad:=(Prompter prompt: 'Ingrese la especialidad').
-arancel=(Prompter prompt: 'Ingrese el arancel').
+arancel=(Prompter prompt: 'Ingrese el arancel') asNumber asFloat.
 
 !
 
 codigo
 ^codigo!
 
+descripcion
+^descripcion!
+
+especialidad
+^especialidad!
+
 muestra
 Transcript cr; show: codigo ; tab; tab; show:descripcion ; tab;tab;show:especialidad;tab;tab;show: arancel printString.
 (MessageBox notify: 'DESCRIPCIÓN		', descripcion , '
 ',
-'CÓDIGO		', codigo , '
-',
-'ESPECIALIDAD	', especialidad ,'
+'ESPECIALIDAD		', especialidad ,'
 ','
-','ARANCEL	', arancel printString,' ').!
+','ARANCEL			', arancel printString caption: 'Búsqueda de intervenciones > Intervención ',codigo).!
 
-precargaDatos: unCod y: unaDesc y: unaEsp y: unArancel 
-codigo = unCod .
-descripcion :=unaDesc .
-especialidad :=unaEsp .
-arancel := unArancel.! !
+precargaDatos: unCod y: unaDesc y: unaEsp y: unArancel
+	codigo := unCod.
+	descripcion := unaDesc.
+	especialidad := unaEsp.
+	arancel := unArancel.! !
 !Intervencion categoriesForMethods!
+arancel!public! !
 cargaDatos:!public! !
 codigo!public! !
+descripcion!public! !
+especialidad!public! !
 muestra!public! !
 precargaDatos:y:y:y:!public! !
 !
@@ -229,31 +239,31 @@ op:='5'.
 [op='0'] whileFalse: [(MessageBox notify: '1 - Buscar pacientes
 2 - Buscar médicos
 3. Buscar Intervenciones
-0 - Volver al menú' caption: 'CONSULTA').
+0 - Volver al menú' caption: 'Menú > Consultas').
 op:=(Prompter prompt: 'Ingrese una opción').
 (op='1') ifTrue: [self consultaPaciente].
 (op='2') ifTrue: [self consultaMedico].
 (op='3') ifTrue: [self consultaIntervencion ].
-(((op='1' or: [op='2']) or: [op='0']) or:[op='0']) ifFalse: [op:=(Prompter prompt: 'Opcion invalida. Ingrese otra.')].
+((((op='1' or: [op='2']) or: [op='0']) or:[op='0']) or: [op='3']) ifFalse: [op:=(Prompter prompt: 'Opcion invalida. Ingrese otra.')].
 ]
 !
 
 consultaIntervencion
-|cod p|
+|cod t|
 
-[p isNil] whileTrue:[
-cod:=Prompter prompt: 'Ingrese el CODIGO de Intervencion'.
-p:= intervencion detect:[:i | i codigo=cod ]
-ifNone:[ MessageBox notify: 'Incorrecto. Vuelva a ingresar el CODIGO o escriba SALIR para regresar al menú.'. p:= nil. ((cod ='SALIR') ifTrue: [p:='3'])]].
+[t isNil] whileTrue:[
+cod:=Prompter prompt: 'Ingrese el código de la intervención' caption:'Consulta > Intervención'.
+t:= intervencion detect:[:i | i codigo = cod]
+ifNone:[ MessageBox notify: 'Incorrecto. Vuelva a ingresar legajo o escriba SALIR para regresar al menú.'. t:= nil. ((cod='SALIR') ifTrue: [t:='3']) ]].
 
-(p isNil) ifFalse: [p muestra].!
+(t isNil) ifFalse: [t muestra].!
 
 consultaMedico
 
 |mat m|
 
 [m isNil] whileTrue:[
-mat:=Prompter prompt: 'Ingrese la matrícula del profesional'.
+mat:=Prompter prompt: 'Ingrese la matrícula del profesional' caption:'Consulta > Médico'.
 m:= medico detect:[:i | i matricula=mat]
 ifNone:[ MessageBox notify: 'Incorrecto. Vuelva a ingresar legajo o escriba SALIR para regresar al menú.'. m:= nil. ((mat='SALIR') ifTrue: [m:='3']) ]].
 
@@ -266,7 +276,7 @@ consultaPaciente
 |pac p|
 
 [p isNil] whileTrue:[
-pac:=Prompter prompt: 'Ingrese el DNI del paciente'.
+pac:=Prompter prompt: 'Ingrese el DNI del paciente' caption:'Consulta > Paciente'.
 p:= paciente detect:[:i | i dni=pac ]
 ifNone:[ MessageBox notify: 'Incorrecto. Vuelva a ingresar el DNI o escriba SALIR para regresar al menú.'. p:= nil. ((pac='SALIR') ifTrue: [p:='3'])]].
 
@@ -293,42 +303,76 @@ m:= medico detect:[:i | i matricula=med] ifNone:[m:= 'no'.].
 (m='no') ifTrue: [^false] ifFalse: [^true ]!
 
 inicio
+	paciente := OrderedCollection new.
+	medico := OrderedCollection new.
+	intervencion := OrderedCollection new.
 
-paciente:=OrderedCollection new.
-medico:=OrderedCollection new.
-intervencion:=OrderedCollection new.
+	intervencion add: (Intervencion new
+				precargaDatos: '01' 
+				y: 'Cirugía de corazón' 
+				y: 'Cardiología' 
+				y: 20000 yourself).
 
+	intervencion add: (Intervencion new
+				precargaDatos: '02' 
+				y: 'Trasplante de riñón' 
+				y: 'Nefrología' y: 25000
+				yourself).
 
-paciente add: (( Paciente new)
-    precargaDatos: '01' y: 'Joel' y: 'Marchesa' y: 'Swiss Medical' y: 10
-    yourself).
+	intervencion add: (Intervencion new
+				precargaDatos: '03' 
+				y: 'Cirugía de cataratas' 
+				y: 'Oftalmología' 
+				y: 5000 yourself).
 
-paciente add: (( Paciente new)
-    precargaDatos: '02' y: 'Tomas' y: 'Messa' y: 'No posee Obra Social' y: 0
-    yourself).
-paciente add: (( Paciente new)
-    precargaDatos: '01' y: 'Joel' y: 'Marchesa' y: 'Swiss Medical' y: 10
-    yourself).
+	intervencion add: (Intervencion new
+				precargaDatos: '04' 
+				y: 'Artroscopia de rodilla' 
+				y: 'Ortopedia'
+				y: 7000 yourself).
 
-paciente add: (( Paciente new)
-    precargaDatos: '03' y: 'Ulises' y: 'Gutiérrez' y: 'Obra Social: OSDE' y: 15
-    yourself).
-
-medico add: (( Medico new)
-    precargaDatos: '01' y: 'Ramón' y: 'Pascual' y: 'Cardiología' y: true
-    yourself).
-
-medico add: (( Medico new)
-    precargaDatos: '02' y: 'Valentín' y: 'Vidente' y: 'Oftalmología' y: true
-    yourself).
-
-medico add: (( Medico new)
-    precargaDatos: '03' y: 'Roberto' y: 'Neuross' y: 'Neurología' y: false
-    yourself).
-
-intervencion add: (( Intervencion new)
-	precargaDatos: '01' y: 'Apendicectomía' y: 'Sist. Digestivo' y: 1000
-	yourself).!
+	paciente add: (Paciente new
+				precargaDatos: '01'
+				y: 'Joel'
+				y: 'Marchesa'
+				y: 'Swiss Medical'
+				y: 10 yourself).
+	paciente add: (Paciente new
+				precargaDatos: '02'
+				y: 'Tomas'
+				y: 'Messa'
+				y: 'No posee Obra Social'
+				y: 0 yourself).
+	paciente add: (Paciente new
+				precargaDatos: '01'
+				y: 'Joel'
+				y: 'Marchesa'
+				y: 'Swiss Medical'
+				y: 10 yourself).
+	paciente add: (Paciente new
+				precargaDatos: '03'
+				y: 'Ulises'
+				y: 'Gutiérrez'
+				y: 'Obra Social: OSDE'
+				y: 15 yourself).
+	medico add: (Medico new
+				precargaDatos: '01'
+				y: 'Ramón'
+				y: 'Pascual'
+				y: 'Cardiología'
+				y: true yourself).
+	medico add: (Medico new
+				precargaDatos: '02'
+				y: 'Valentín'
+				y: 'Vidente'
+				y: 'Oftalmología'
+				y: true yourself).
+	medico add: (Medico new
+				precargaDatos: '03'
+				y: 'Roberto'
+				y: 'Neuross'
+				y: 'Neurología'
+				y: false yourself)!
 
 liquidacion
 
@@ -374,19 +418,22 @@ op:=(Prompter prompt: 'Ingrese una opción:').
 !
 
 registrarIntervencion
-|rta p cod|
+|rta rta2 t cod|
 
 rta:= true.
 
 [rta] whileTrue: [
-    cod := (Prompter prompt: 'Ingrese el codigo').
+    cod := (Prompter prompt: 'Ingrese el codigo' caption:'Menú administrador > Registro > Intervención').
     (self existeCOD: cod) ifTrue: [
-        MessageBox notify: 'El codigo ya existe. Por favor, ingrese otro.'.
+        MessageBox notify: 'El codigo ya existe. Por favor, ingrese otro.' caption:'Menú administrador > Registro > Intervención'.
     ] ifFalse: [
-        p:= Intervencion new.
-        p cargaDatos: cod .
-        intervencion add: p.
-        rta:= MessageBox confirm: 'Desea ingresar otra intervencion?'
+        rta2 := MessageBox confirm: '¿Es una intervencion de alta complejidad?' caption:'Menú administrador > Registro > Intervención'.
+        t := rta2
+            ifTrue: [AltaComplejidad new]
+            ifFalse: [Intervencion new].
+        t cargaDatos: cod .
+        intervencion add: t.
+        rta:= MessageBox confirm: 'Desea ingresar otra intervencion?' caption:'Menú administrador > Registro > Intervención'
     ]].!
 
 registrarMedico
@@ -396,14 +443,14 @@ registrarMedico
 rta:= true.
 
 [rta] whileTrue: [
-    matricula := (Prompter prompt: 'Ingrese la matrícula').
+    matricula := (Prompter prompt: 'Ingrese la matrícula' caption:'Menú administrador > Registro > Médico').
     (self existeMatricula: matricula) ifTrue: [
-        MessageBox notify: 'La matrícula ya existe. Por favor, ingrese otra.'.
+        MessageBox notify: 'La matrícula ya existe. Por favor, ingrese otra.' caption:'Menú administrador > Registro > Médico'.
     ] ifFalse: [
         m:= Medico new.
         m cargaDatos: matricula .
         medico add: m.
-        rta:= MessageBox confirm: 'Desea ingresar otro paciente?'
+        rta:= MessageBox confirm: '¿Desea ingresar otro médico?'  caption:'Menú administrador > Registro > Médico'
     ]].
 !
 
@@ -413,14 +460,14 @@ registrarPaciente
 rta:= true.
 
 [rta] whileTrue: [
-    dni := (Prompter prompt: 'Ingrese DNI').
+    dni := (Prompter prompt: 'Ingrese DNI' caption:'Menú administrador > Registro > Paciente').
     (self existeDNI: dni) ifTrue: [
-        MessageBox notify: 'El DNI ya existe. Por favor, ingrese otro.'.
+        MessageBox notify: 'El DNI ya existe. Por favor, ingrese otro.' caption:'Menú administrador > Registro > Paciente'.
     ] ifFalse: [
         p:= Paciente new.
         p cargaDatos: dni .
         paciente add: p.
-        rta:= MessageBox confirm: 'Desea ingresar otro paciente?'
+        rta:= MessageBox confirm: 'Desea ingresar otro paciente?' caption:'Menú administrador > Registro > Paciente'
     ]].!
 
 validarMedico
