@@ -7,6 +7,7 @@ package paxVersion: 1;
 package classNames
 	add: #AltaComplejidad;
 	add: #Intervencion;
+	add: #IntervencionRegistrada;
 	add: #Medico;
 	add: #Paciente;
 	add: #Sanatorio;
@@ -19,16 +20,21 @@ package globalAliases: (Set new
 	yourself).
 
 package setPrerequisites: #(
-	'C:\Users\Fringe\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\Base\Dolphin'
-	'C:\Users\Fringe\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\Base\Dolphin Message Box'
-	'C:\Users\Fringe\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\MVP\Presenters\Prompters\Dolphin Prompter').
+	'C:\Users\IPP\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\Base\Dolphin'
+	'C:\Users\IPP\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\Base\Dolphin Message Box'
+	'C:\Users\IPP\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\MVP\Presenters\Prompters\Dolphin Prompter').
 
 package!
 
 "Class Definitions"!
 
 Object subclass: #Intervencion
-	instanceVariableNames: 'fecha medico intervencion condicionPago codigo descripcion especialidad arancel'
+	instanceVariableNames: 'codigo descripcion especialidad arancel'
+	classVariableNames: ''
+	poolDictionaries: ''
+	classInstanceVariableNames: ''!
+Object subclass: #IntervencionRegistrada
+	instanceVariableNames: 'fecha medico intervencion condicionPago'
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
@@ -69,18 +75,44 @@ Intervencion comment: ''!
 !Intervencion categoriesForClass!Kernel-Objects! !
 !Intervencion methodsFor!
 
-cargaDatos
+cargaDatos: unCod
 
-^ MessageBox notify: 'CargaDatos'!
 
-mostrarCondicion
+codigo:=unCod.
+descripcion:=(Prompter prompt: 'Ingrese la descripcion').
+especialidad:=(Prompter prompt: 'Ingrese la especialidad').
+arancel=(Prompter prompt: 'Ingrese el arancel').
 
-^ MessageBox notify: 'Mostrar condicion'! !
-!Intervencion categoriesForMethods!
-cargaDatos!public! !
-mostrarCondicion!public! !
 !
 
+codigo
+^codigo!
+
+muestra
+Transcript cr; show: codigo ; tab; tab; show:descripcion ; tab;tab;show:especialidad;tab;tab;show: arancel printString.
+(MessageBox notify: 'DESCRIPCIÓN		', descripcion , '
+',
+'CÓDIGO		', codigo , '
+',
+'ESPECIALIDAD	', especialidad ,'
+','
+','ARANCEL	', arancel printString,' ').!
+
+precargaDatos: unCod y: unaDesc y: unaEsp y: unArancel 
+codigo = unCod .
+descripcion :=unaDesc .
+especialidad :=unaEsp .
+arancel := unArancel.! !
+!Intervencion categoriesForMethods!
+cargaDatos:!public! !
+codigo!public! !
+muestra!public! !
+precargaDatos:y:y:y:!public! !
+!
+
+IntervencionRegistrada guid: (GUID fromString: '{e572bfc1-8db5-432d-a93c-cb49ed4d6a0b}')!
+IntervencionRegistrada comment: ''!
+!IntervencionRegistrada categoriesForClass!Kernel-Objects! !
 Medico guid: (GUID fromString: '{2589d0d7-de77-4739-ac65-7d764c177c02}')!
 Medico comment: ''!
 !Medico categoriesForClass!Kernel-Objects! !
@@ -207,8 +239,14 @@ op:=(Prompter prompt: 'Ingrese una opción').
 !
 
 consultaIntervencion
+|cod p|
 
-^ MessageBox notify: 'Int'!
+[p isNil] whileTrue:[
+cod:=Prompter prompt: 'Ingrese el CODIGO de Intervencion'.
+p:= intervencion detect:[:i | i codigo=cod ]
+ifNone:[ MessageBox notify: 'Incorrecto. Vuelva a ingresar el CODIGO o escriba SALIR para regresar al menú.'. p:= nil. ((cod ='SALIR') ifTrue: [p:='3'])]].
+
+(p isNil) ifFalse: [p muestra].!
 
 consultaMedico
 
@@ -233,6 +271,13 @@ p:= paciente detect:[:i | i dni=pac ]
 ifNone:[ MessageBox notify: 'Incorrecto. Vuelva a ingresar el DNI o escriba SALIR para regresar al menú.'. p:= nil. ((pac='SALIR') ifTrue: [p:='3'])]].
 
 (p isNil) ifFalse: [p muestra].!
+
+existeCOD: unCOD
+|i int|
+int:= unCOD.
+i:= intervencion detect:[:each | each codigo=int] ifNone:[i:= 'no'.].
+(i='no') ifTrue: [^false] ifFalse: [^true ]
+!
 
 existeDNI: unDNI
 | p pac|
@@ -279,7 +324,11 @@ medico add: (( Medico new)
 
 medico add: (( Medico new)
     precargaDatos: '03' y: 'Roberto' y: 'Neuross' y: 'Neurología' y: false
-    yourself).!
+    yourself).
+
+intervencion add: (( Intervencion new)
+	precargaDatos: '01' y: 'Apendicectomía' y: 'Sist. Digestivo' y: 1000
+	yourself).!
 
 liquidacion
 
@@ -318,14 +367,27 @@ op:='4'.
 op:=(Prompter prompt: 'Ingrese una opción:').
 (op='1') ifTrue: [self registrarPaciente].
 (op= '2') ifTrue: [self registrarMedico].
-((op='1' or: [op='2']) or: [op='0']) ifFalse: [op:=(Prompter prompt: 'Opcion invalida. Ingrese otra.')]
+(op='3') ifTrue: [self registrarIntervencion].
+(((op='1' or: [op='2']) or: [op='0']) or: [op='3']) ifFalse: [op:=(Prompter prompt: 'Opcion invalida. Ingrese otra.')]
 ]
 
 !
 
 registrarIntervencion
+|rta p cod|
 
-^ MessageBox notify: 'Registrar Intervencion'!
+rta:= true.
+
+[rta] whileTrue: [
+    cod := (Prompter prompt: 'Ingrese el codigo').
+    (self existeCOD: cod) ifTrue: [
+        MessageBox notify: 'El codigo ya existe. Por favor, ingrese otro.'.
+    ] ifFalse: [
+        p:= Intervencion new.
+        p cargaDatos: cod .
+        intervencion add: p.
+        rta:= MessageBox confirm: 'Desea ingresar otra intervencion?'
+    ]].!
 
 registrarMedico
 
@@ -372,6 +434,7 @@ consulta!public! !
 consultaIntervencion!public! !
 consultaMedico!public! !
 consultaPaciente!public! !
+existeCOD:!public! !
 existeDNI:!public! !
 existeMatricula:!public! !
 inicio!public! !
