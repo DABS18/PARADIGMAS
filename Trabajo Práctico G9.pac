@@ -84,7 +84,7 @@ cargaDatos: unCod
 codigo:=unCod.
 descripcion:=(Prompter prompt: 'Ingrese la descripcion').
 especialidad:=(Prompter prompt: 'Ingrese la especialidad').
-arancel=(Prompter prompt: 'Ingrese el arancel') asNumber asFloat.
+arancel:=(Prompter prompt: 'Ingrese el arancel') asNumber asFloat.
 
 !
 
@@ -306,6 +306,7 @@ inicio
 	paciente := OrderedCollection new.
 	medico := OrderedCollection new.
 	intervencion := OrderedCollection new.
+	"AltaComplejidad cargaAdicional."
 
 	intervencion add: (Intervencion new
 				precargaDatos: '01' 
@@ -313,11 +314,12 @@ inicio
 				y: 'Cardiología' 
 				y: 20000 yourself).
 
-	intervencion add: (Intervencion new
+	intervencion add: (AltaComplejidad new
 				precargaDatos: '02' 
 				y: 'Trasplante de riñón' 
-				y: 'Nefrología' y: 25000
-				yourself).
+				y: 'Nefrología'
+				y: 25000 	yourself).
+				AltaComplejidad precargaAdicional: 15.
 
 	intervencion add: (Intervencion new
 				precargaDatos: '03' 
@@ -422,6 +424,7 @@ registrarIntervencion
 
 rta:= true.
 
+(intervencion isEmpty) ifTrue: [AltaComplejidad cargaAdicional].
 [rta] whileTrue: [
     cod := (Prompter prompt: 'Ingrese el codigo' caption:'Menú administrador > Registro > Intervención').
     (self existeCOD: cod) ifTrue: [
@@ -470,6 +473,8 @@ rta:= true.
         rta:= MessageBox confirm: 'Desea ingresar otro paciente?' caption:'Menú administrador > Registro > Paciente'
     ]].!
 
+validarEspecialidadDe: unMedico con: unaIntervencion!
+
 validarMedico
 
 ^ MessageBox notify: 'valMedico'!
@@ -492,6 +497,7 @@ menuAdmin!public! !
 registrarIntervencion!public! !
 registrarMedico!public! !
 registrarPaciente!public! !
+validarEspecialidadDe:con:!public! !
 validarMedico!public! !
 validarPaciente!public! !
 !
@@ -501,20 +507,30 @@ AltaComplejidad comment: ''!
 !AltaComplejidad categoriesForClass!Kernel-Objects! !
 !AltaComplejidad methodsFor!
 
-calcularArancel
-
-^ MessageBox notify: 'Calcular arancel'! !
+muestra
+Transcript cr; show: codigo ; tab; tab; show:descripcion ; tab;tab;show:especialidad;tab;tab;show: arancel printString.
+(MessageBox notify: 'DESCRIPCIÓN		', descripcion , '
+',
+'ESPECIALIDAD		', especialidad ,'
+','
+','ARANCEL			', arancel printString , '
+', 'ADICIONAL		', Adicional printString,'%' caption: 'Búsqueda de intervenciones > Intervención ',codigo).! !
 !AltaComplejidad categoriesForMethods!
-calcularArancel!public! !
+muestra!public! !
 !
 
 !AltaComplejidad class methodsFor!
 
 cargaAdicional
 
-^ MessageBox notify: 'CargaAdicional'! !
+Adicional:= (Prompter prompt: 'Ingrese el porcentaje adicional') asNumber asFloat.!
+
+precargaAdicional: unAdic
+
+Adicional:=unAdic.! !
 !AltaComplejidad class categoriesForMethods!
 cargaAdicional!public! !
+precargaAdicional:!public! !
 !
 
 "Binary Globals"!
