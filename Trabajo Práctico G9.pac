@@ -347,8 +347,8 @@ inicio
 				y: 0 yourself).
 	paciente add: (Paciente new
 				precargaDatos: '01'
-				y: 'Joel'
-				y: 'Marchesa'
+				y: 'Javier'
+				y: 'De Lujan'
 				y: 'Swiss Medical'
 				y: 10 yourself).
 	paciente add: (Paciente new
