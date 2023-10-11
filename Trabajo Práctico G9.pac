@@ -142,6 +142,9 @@ Medico comment: ''!
 !Medico categoriesForClass!Kernel-Objects! !
 !Medico methodsFor!
 
+apellido
+^apellido!
+
 cargaDatos: unaMatricula
 
 matricula:=unaMatricula.
@@ -152,11 +155,11 @@ condicion:=(MessageBox confirm:'¿Está disponible?').!
 
 condicion
 
-^ MessageBox notify: 'Condición'!
+^condicion!
 
 especialidad
 
-^ MessageBox notify: 'Especialidad'!
+^ especialidad!
 
 matricula
 ^matricula!
@@ -174,6 +177,9 @@ Transcript cr; show: nombre; tab; tab; show:apellido; tab;tab;show:matricula pri
 (condicion ifTrue: ['	  ✔️ Disponible '] ifFalse: ['	  ❌No disponible ']) caption:'Resultado encontrado'
 )!
 
+nombre
+^nombre!
+
 precargaDatos: unaMatricula y: unNombre y: unApellido y: unaEspecialidad y: unaCondicion
 matricula:= unaMatricula.
 nombre:=unNombre.
@@ -181,11 +187,13 @@ apellido:=unApellido.
 especialidad:=unaEspecialidad.
 condicion:=unaCondicion.! !
 !Medico categoriesForMethods!
+apellido!public! !
 cargaDatos:!public! !
 condicion!public! !
 especialidad!public! !
 matricula!public! !
 muestra!public! !
+nombre!public! !
 precargaDatos:y:y:y:y:!public! !
 !
 
@@ -296,6 +304,21 @@ ifNone:[ MessageBox notify: 'Incorrecto. Vuelva a ingresar el DNI o escriba SALI
 
 (p isNil) ifFalse: [p muestra].!
 
+convertirCodigo: unCodigo y: unaOpcion
+|i|
+(unaOpcion=1) ifTrue: [
+    i:= intervencion detect:[:each | each codigo=unCodigo].
+    ^ (i descripcion) printString.
+] ifFalse:[
+(unaOpcion=2) ifTrue:[
+    i:= medico detect:[:each | each matricula=unCodigo].
+    ^ (i nombre, ' ' , i apellido) printString .
+] ifFalse:[
+    i:= paciente detect:[:each | each dni=unCodigo].
+    ^ (i nombre, ' ' , i apellido) printString .
+]
+]!
+
 esFechaValida: unaFecha
     | fechaHoy fecha temp |
     fecha := [Date fromString: unaFecha format: 'MM/DD/yyyy']  on: Error do: [:each | temp:= false].
@@ -318,6 +341,12 @@ pac:= unDNI.
 p:= paciente detect:[:i | i dni=pac] ifNone:[p:= 'no'.].
 (p='no') ifTrue: [^false] ifFalse: [^true ]
 !
+
+existeEspecialidad: unaEspecialidad
+|e esp|
+esp:= unaEspecialidad.
+e:= intervencion detect:[:i | i especialidad=esp] ifNone:[e:= 'no'.].
+(e='no') ifTrue: [^false] ifFalse: [^true ]!
 
 existeMatricula: unaMatricula
 | m med|
@@ -385,8 +414,14 @@ inicio
 				precargaDatos: '01'
 				y: 'Ramón'
 				y: 'Pascual'
-				y: 'Cardiología'
+				y: 'Nefrología'
 				y: true yourself).
+	medico add: (Medico new
+				precargaDatos: '05'
+				y: 'Error'
+				y: 'Pascual'
+				y: 'Nefrología'
+				y: false yourself).
 	medico add: (Medico new
 				precargaDatos: '02'
 				y: 'Valentín'
@@ -400,6 +435,26 @@ inicio
 				y: 'Neurología'
 				y: false yourself)!
 
+intervencionesDisponibles: unaEspecialidad
+|coleccion temp|
+coleccion := intervencion select: [:each | each especialidad=unaEspecialidad].
+(coleccion isEmpty) 
+    ifTrue:[MessageBox notify: 'No hay intervenciones disponibles.' ]
+    ifFalse: [
+	Transcript clear.
+	Transcript show: 'ESPECIALIDAD - '; show: unaEspecialidad asUppercase; cr.
+	Transcript show: 'CÓDIGO'; tab;tab; show:'DESCRIPCIÓN';tab;tab;show:'ARANCEL'; cr.
+        coleccion do: [:each | 
+            Transcript 
+                show: each codigo; tab;tab;
+		show: each descripcion; tab;tab;
+		show: each arancel printString; tab;tab;
+                cr.
+        ].
+	temp:= Transcript contents.
+	^temp
+    ]!
+
 liquidacion
 
 ^ MessageBox notify: 'liquidacion'!
@@ -407,6 +462,26 @@ liquidacion
 listar: coleccion
 Transcript cr;show: 'NOMBRE';tab;show:'LEGAJO';tab;show:'NOTA';cr.
 coleccion do: [:each | each muestra ]!
+
+medicosDisponibles: unaEspecialidad
+|coleccion1 coleccion2 temp|
+coleccion1 := medico select: [:each | each condicion].
+coleccion2:= coleccion1 select: [:each | each especialidad=unaEspecialidad].
+(coleccion2 isEmpty) 
+    ifTrue:[MessageBox notify: 'No hay médicos disponibles.' ]
+    ifFalse: [
+	Transcript clear.
+	Transcript show: 'ESPECIALIDAD - '; show: unaEspecialidad asUppercase; cr.
+	Transcript show: 'MATRÍCULA'; tab; show:'PROFESIONAL'; cr.
+        coleccion2 do: [:each | 
+            Transcript 
+                show: each matricula; tab; tab;
+		show: each nombre; show: ' '; show: each apellido; tab; tab;
+                cr.
+        ].
+	temp:= Transcript contents.
+	^temp
+    ]!
 
 menu
 |op|
@@ -452,7 +527,7 @@ rta:= true.
 [rta] whileTrue: [
     cod := (Prompter prompt: 'Ingrese el codigo' caption:'Menú administrador > Registro > Intervención').
     (self existeCOD: cod) ifTrue: [
-        MessageBox notify: 'El codigo ya existe. Por favor, ingrese otro.' caption:'Menú administrador > Registro > Intervención'.
+        MessageBox warning: 'El codigo ya existe. Por favor, ingrese otro.' caption:'Menú administrador > Registro > Intervención'.
     ] ifFalse: [
         rta2 := MessageBox confirm: '¿Es una intervencion de alta complejidad?' caption:'Menú administrador > Registro > Intervención'.
         t := rta2
@@ -465,20 +540,40 @@ rta:= true.
 
 registrarIntervencionPaciente
 
-|rta p fecha inter med pac cond|
+|rta p fecha inter med pac espe temp|
 
 rta:= true.
 
 [rta] whileTrue: [
     fecha := (Prompter prompt: 'Ingrese una fecha. (MM/DD/YYYY)' caption:'Menú administrador > Registro > Intervención de paciente').
     (self esFechaValida: fecha) ifFalse: [
-        MessageBox notify: 'Fecha inválida. Vuelva a intentarlo.' caption:'Menú administrador > Registro > Intervención de paciente'.
+        MessageBox warning: 'Fecha inválida. Vuelva a intentarlo.' caption:'Menú administrador > Registro > Intervención de paciente'.
     ] ifTrue: [
+	pac := (Prompter prompt: 'Ingrese el DNI del paciente' caption:'Menú administrador > Registro > Intervención de paciente').
+	[self existeDNI: pac] whileFalse: [
+	      pac:= Prompter prompt: 'El documento ingresado no coincide con nuestros registros. Vuelva a intentarlo.' caption:'Menú administrador > Registro > Intervención de paciente'.
+	].
+	inter:= Prompter prompt: 'Ingrese la especialidad.' caption:'Menú administrador > Registro > Intervención de paciente'.
+	[self existeEspecialidad: inter ] whileFalse: [
+		inter:= Prompter prompt: 'Los datos ingresados no coinciden con nuestros registros. Vuelva a intentarlo.' caption:'Menú administrador > Registro > Intervención de paciente'.
+	].
+	temp:= MessageBox notify:(self medicosDisponibles: inter) printString.
+	med:= Prompter prompt: 'Ingrese la matrícula del profesional' caption:'Menú administrador > Registro > Intervención de paciente'.
+	[self validarMedico: med y: inter] whileFalse: [
+		med:= Prompter prompt: 'La matrícula ingresada no coincide con nuestros registros. Vuelva a intentarlo.' caption:'Menú administrador > Registro > Intervención de paciente'.
+	].
+	temp:= MessageBox notify:(self intervencionesDisponibles: inter) printString.
+	espe:= Prompter prompt: 'Ingrese el código de intervención' caption:'Menú administrador > Registro > Intervención de paciente'.
+	[self validarIntervencion: espe y: inter] whileFalse: [
+		espe:= Prompter prompt: 'El código de intervención ingresado no coincide con nuestros registros. Vuelva a intentarlo.' caption:'Menú administrador > Registro > Intervención de paciente'.
+	].
+	
         p:= IntervencionRegistrada new.
-        p cargaDatos: fecha y: '' y: '' y: ''.
+        p cargaDatos: fecha y: pac y:(self convertirCodigo: espe y: 2 ) y: (self convertirCodigo: espe y: 1 ).
         intervencionPaciente add: p.
         rta:= MessageBox confirm: '¿Desea registrar otra intervención?' caption:'Menú administrador > Registro > Intervención de paciente'
-    ]].!
+    ]].
+!
 
 registrarMedico
 
@@ -489,7 +584,7 @@ rta:= true.
 [rta] whileTrue: [
     matricula := (Prompter prompt: 'Ingrese la matrícula' caption:'Menú administrador > Registro > Médico').
     (self existeMatricula: matricula) ifTrue: [
-        MessageBox notify: 'La matrícula ya existe. Por favor, ingrese otra.' caption:'Menú administrador > Registro > Médico'.
+        MessageBox warning: 'La matrícula ya existe. Por favor, ingrese otra.' caption:'Menú administrador > Registro > Médico'.
     ] ifFalse: [
         m:= Medico new.
         m cargaDatos: matricula .
@@ -506,7 +601,7 @@ rta:= true.
 [rta] whileTrue: [
     dni := (Prompter prompt: 'Ingrese DNI' caption:'Menú administrador > Registro > Paciente').
     (self existeDNI: dni) ifTrue: [
-        MessageBox notify: 'El DNI ya existe. Por favor, ingrese otro.' caption:'Menú administrador > Registro > Paciente'.
+        MessageBox warning: 'El DNI ya existe. Por favor, ingrese otro.' caption:'Menú administrador > Registro > Paciente'.
     ] ifFalse: [
         p:= Paciente new.
         p cargaDatos: dni .
@@ -514,35 +609,42 @@ rta:= true.
         rta:= MessageBox confirm: 'Desea ingresar otro paciente?' caption:'Menú administrador > Registro > Paciente'
     ]].!
 
-validarEspecialidadDe: unMedico con: unaIntervencion!
+validarIntervencion: unCodigo y: unaEspec
+| m cod inter|
+cod:= unCodigo.
+m:= intervencion detect:[:i | i codigo=unCodigo and: [i especialidad=unaEspec] ] ifNone:[m:= 'no'.].
+(m='no') ifTrue: [^false] ifFalse: [^true ]!
 
-validarMedico
-
-^ MessageBox notify: 'valMedico'!
-
-validarPaciente
-! !
+validarMedico: unaMatricula y: unaEspecialidad 
+| m med int|
+med:= unaMatricula.
+int:=unaEspecialidad.
+m:= medico detect:[:i | i matricula=med and: [i especialidad=int and: [i condicion=true] ] ] ifNone:[m:= 'no'.].
+(m='no') ifTrue: [^false] ifFalse: [^true ]! !
 !Sanatorio categoriesForMethods!
 consulta!public! !
 consultaIntervencion!public! !
 consultaMedico!public! !
 consultaPaciente!public! !
+convertirCodigo:y:!public! !
 esFechaValida:!public! !
 existeCOD:!public! !
 existeDNI:!public! !
+existeEspecialidad:!public! !
 existeMatricula:!public! !
 inicio!public! !
+intervencionesDisponibles:!public! !
 liquidacion!public! !
 listar:!public! !
+medicosDisponibles:!public! !
 menu!public! !
 menuAdmin!public! !
 registrarIntervencion!public! !
 registrarIntervencionPaciente!public! !
 registrarMedico!public! !
 registrarPaciente!public! !
-validarEspecialidadDe:con:!public! !
-validarMedico!public! !
-validarPaciente!public! !
+validarIntervencion:y:!public! !
+validarMedico:y:!public! !
 !
 
 AltaComplejidad guid: (GUID fromString: '{a632a6b3-501a-4a70-abee-034483a530bc}')!
