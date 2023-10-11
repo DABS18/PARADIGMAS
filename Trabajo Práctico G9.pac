@@ -21,6 +21,7 @@ package globalAliases: (Set new
 
 package setPrerequisites: #(
 	'C:\Users\Fringe\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\Base\Dolphin'
+	'C:\Users\Fringe\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\Base\Dolphin Legacy Date & Time'
 	'C:\Users\Fringe\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\Base\Dolphin Message Box'
 	'C:\Users\Fringe\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\MVP\Presenters\Prompters\Dolphin Prompter').
 
@@ -34,7 +35,7 @@ Object subclass: #Intervencion
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
 Object subclass: #IntervencionRegistrada
-	instanceVariableNames: 'fecha medico intervencion condicionPago'
+	instanceVariableNames: 'fecha medico paciente intervencion condicionPago'
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
@@ -49,7 +50,7 @@ Object subclass: #Paciente
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
 Object subclass: #Sanatorio
-	instanceVariableNames: 'medico paciente intervencion'
+	instanceVariableNames: 'medico paciente intervencion intervencionPaciente'
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
@@ -123,6 +124,19 @@ precargaDatos:y:y:y:!public! !
 IntervencionRegistrada guid: (GUID fromString: '{e572bfc1-8db5-432d-a93c-cb49ed4d6a0b}')!
 IntervencionRegistrada comment: ''!
 !IntervencionRegistrada categoriesForClass!Kernel-Objects! !
+!IntervencionRegistrada methodsFor!
+
+cargaDatos: unaFecha y: unPaciente y: unMedico y:unaIntervencion
+
+fecha:=unaFecha.
+paciente:=unPaciente.
+medico:=unMedico.
+intervencion:=unaIntervencion.
+condicionPago:=(MessageBox confirm: '¿Está pagada?' ).! !
+!IntervencionRegistrada categoriesForMethods!
+cargaDatos:y:y:y:!public! !
+!
+
 Medico guid: (GUID fromString: '{2589d0d7-de77-4739-ac65-7d764c177c02}')!
 Medico comment: ''!
 !Medico categoriesForClass!Kernel-Objects! !
@@ -282,6 +296,15 @@ ifNone:[ MessageBox notify: 'Incorrecto. Vuelva a ingresar el DNI o escriba SALI
 
 (p isNil) ifFalse: [p muestra].!
 
+esFechaValida: unaFecha
+    | fechaHoy fecha temp |
+    fecha := [Date fromString: unaFecha format: 'MM/DD/yyyy']  on: Error do: [:each | temp:= false].
+    (temp=false) ifTrue: [temp:=false] ifFalse:[temp:=true].
+    fechaHoy := Date today.
+    ^ (temp=true and: [fecha >= fechaHoy]).
+	
+  !
+
 existeCOD: unCOD
 |i int|
 int:= unCOD.
@@ -306,6 +329,7 @@ inicio
 	paciente := OrderedCollection new.
 	medico := OrderedCollection new.
 	intervencion := OrderedCollection new.
+	intervencionPaciente:= OrderedCollection new.
 	"AltaComplejidad cargaAdicional."
 
 	intervencion add: (Intervencion new
@@ -347,8 +371,8 @@ inicio
 				y: 0 yourself).
 	paciente add: (Paciente new
 				precargaDatos: '01'
-				y: 'Javier'
-				y: 'De Lujan'
+				y: 'Joel'
+				y: 'Marchesa'
 				y: 'Swiss Medical'
 				y: 10 yourself).
 	paciente add: (Paciente new
@@ -393,7 +417,7 @@ op:='5'.
 3. Consultas
 0 - Salir' caption: 'MENU DE OPCIONES'.
 op:=(Prompter prompt: 'Ingrese una opcion').
-(op='1') ifTrue: [self registrarIntervencion].
+(op='1') ifTrue: [self registrarIntervencionPaciente].
 (op='2') ifTrue: [self liquidacion].
 (op='3') ifTrue: [self consulta].
 (op= '/admin') ifTrue: [self menuAdmin].
@@ -437,6 +461,23 @@ rta:= true.
         t cargaDatos: cod .
         intervencion add: t.
         rta:= MessageBox confirm: 'Desea ingresar otra intervencion?' caption:'Menú administrador > Registro > Intervención'
+    ]].!
+
+registrarIntervencionPaciente
+
+|rta p fecha inter med pac cond|
+
+rta:= true.
+
+[rta] whileTrue: [
+    fecha := (Prompter prompt: 'Ingrese una fecha. (MM/DD/YYYY)' caption:'Menú administrador > Registro > Intervención de paciente').
+    (self esFechaValida: fecha) ifFalse: [
+        MessageBox notify: 'Fecha inválida. Vuelva a intentarlo.' caption:'Menú administrador > Registro > Intervención de paciente'.
+    ] ifTrue: [
+        p:= IntervencionRegistrada new.
+        p cargaDatos: fecha y: '' y: '' y: ''.
+        intervencionPaciente add: p.
+        rta:= MessageBox confirm: '¿Desea registrar otra intervención?' caption:'Menú administrador > Registro > Intervención de paciente'
     ]].!
 
 registrarMedico
@@ -486,6 +527,7 @@ consulta!public! !
 consultaIntervencion!public! !
 consultaMedico!public! !
 consultaPaciente!public! !
+esFechaValida:!public! !
 existeCOD:!public! !
 existeDNI:!public! !
 existeMatricula:!public! !
@@ -495,6 +537,7 @@ listar:!public! !
 menu!public! !
 menuAdmin!public! !
 registrarIntervencion!public! !
+registrarIntervencionPaciente!public! !
 registrarMedico!public! !
 registrarPaciente!public! !
 validarEspecialidadDe:con:!public! !
