@@ -451,7 +451,7 @@ coleccion := intervencion select: [:each | each especialidad=unaEspecialidad].
 		show: each arancel printString; tab;tab;
                 cr.
         ].
-	temp:= Transcript contents.
+	temp:= (Transcript contents) asString.
 	^temp
     ]!
 
@@ -479,7 +479,7 @@ coleccion2:= coleccion1 select: [:each | each especialidad=unaEspecialidad].
 		show: each nombre; show: ' '; show: each apellido; tab; tab;
                 cr.
         ].
-	temp:= Transcript contents.
+	temp:= (Transcript contents) asString.
 	^temp
     ]!
 
@@ -557,12 +557,12 @@ rta:= true.
 	[self existeEspecialidad: inter ] whileFalse: [
 		inter:= Prompter prompt: 'Los datos ingresados no coinciden con nuestros registros. Vuelva a intentarlo.' caption:'Menú administrador > Registro > Intervención de paciente'.
 	].
-	temp:= MessageBox notify:(self medicosDisponibles: inter) printString.
+	temp:= MessageBox notify:(self medicosDisponibles: inter).
 	med:= Prompter prompt: 'Ingrese la matrícula del profesional' caption:'Menú administrador > Registro > Intervención de paciente'.
 	[self validarMedico: med y: inter] whileFalse: [
 		med:= Prompter prompt: 'La matrícula ingresada no coincide con nuestros registros. Vuelva a intentarlo.' caption:'Menú administrador > Registro > Intervención de paciente'.
 	].
-	temp:= MessageBox notify:(self intervencionesDisponibles: inter) printString.
+	temp:= MessageBox notify:(self intervencionesDisponibles: inter).
 	espe:= Prompter prompt: 'Ingrese el código de intervención' caption:'Menú administrador > Registro > Intervención de paciente'.
 	[self validarIntervencion: espe y: inter] whileFalse: [
 		espe:= Prompter prompt: 'El código de intervención ingresado no coincide con nuestros registros. Vuelva a intentarlo.' caption:'Menú administrador > Registro > Intervención de paciente'.
