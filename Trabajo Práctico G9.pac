@@ -137,13 +137,34 @@ condicionPago:= unaCondicion.!
 condicionPago
 ^condicionPago!
 
+fecha
+^fecha!
+
+intervencion
+^intervencion!
+
+medico
+^medico!
+
 paciente
 ^paciente
-! !
+!
+
+precargaDatos: unaFecha y: unPaciente y: unMedico y: unaIntervencion y: unaCondicion
+
+fecha:=unaFecha.
+paciente:=unPaciente.
+medico:=unMedico.
+intervencion:=unaIntervencion.
+condicionPago:= unaCondicion.! !
 !IntervencionRegistrada categoriesForMethods!
 cargaDatos:y:y:y:y:!public! !
 condicionPago!public! !
+fecha!public! !
+intervencion!public! !
+medico!public! !
 paciente!public! !
+precargaDatos:y:y:y:y:!public! !
 !
 
 Medico guid: (GUID fromString: '{2589d0d7-de77-4739-ac65-7d764c177c02}')!
@@ -244,6 +265,14 @@ Transcript cr; show: nombre; tab; tab; show:apellido; tab;tab;show:dni printStri
 nombre
 ^nombre!
 
+obraSocial
+
+^obraSocial!
+
+porcCobertura
+
+^porcCobertura!
+
 precargaDatos: unDni y: unNombre y: unApellido y: unaOb y: unPorc
 dni:= unDni.
 nombre:=unNombre.
@@ -256,6 +285,8 @@ cargaDatos:!public! !
 dni!public! !
 muestra!public! !
 nombre!public! !
+obraSocial!public! !
+porcCobertura!public! !
 precargaDatos:y:y:y:y:!public! !
 !
 
@@ -263,6 +294,26 @@ Sanatorio guid: (GUID fromString: '{bb5d2598-1dbf-4024-8299-8a84559782e8}')!
 Sanatorio comment: ''!
 !Sanatorio categoriesForClass!Kernel-Objects! !
 !Sanatorio methodsFor!
+
+buscarEnColeccion: unValor y: unaColeccion
+|temp|
+
+(unaColeccion = intervencion) ifTrue:[
+	temp:= unaColeccion detect:[:i | i codigo = unValor]  
+].
+(unaColeccion = medico) ifTrue: [
+	temp:= unaColeccion detect:[:i | i matricula = unValor]  
+].
+(unaColeccion = paciente) ifTrue: [
+	temp:= unaColeccion detect:[:i | i dni = unValor]  
+].
+^temp!
+
+calcDescuento: unTotal y: unPorcentaje
+
+^(unTotal*unPorcentaje)/100
+
+!
 
 consulta
 |op|
@@ -337,6 +388,27 @@ esFechaValida: unaFecha
 	
   !
 
+estadoliquidacion: unDNI
+	|temp coleccionPaciente coleccion2 tempInt tempMed Total|
+	Total:= 0.
+	coleccionPaciente:= (self buscarEnColeccion: unDNI y: paciente).	
+	coleccion2 := intervencionPaciente select:[:each | each paciente = unDNI and:[each condicionPago = false]].
+	Transcript clear.
+	Transcript show: 'Liquidacion del paciente: ';show: coleccionPaciente nombre;show: ' ';show: coleccionPaciente apellido;show: '  Obra social:  '; show: coleccionPaciente obraSocial; cr.
+	Transcript show: 'Fecha';tab; show: 'Descripcion      ';show: 'Medico';tab; show: 'Mat.';tab; show: 'Importe'; cr.
+        coleccion2 do: [:i |
+	    tempInt:= (self buscarEnColeccion: (i intervencion) y: intervencion).
+	    tempMed:= (self buscarEnColeccion: (i medico) y: medico).
+            Transcript show: i fecha;show: '    '; show: tempInt descripcion;show: '   ' ;show: tempMed nombre;show:' ';show: tempMed apellido;show: '   '; show: tempMed matricula;show: '   ';show: '$'; print: tempInt arancel; tab; tab;
+                cr.
+	    Total:= Total + (tempInt arancel).
+        ].
+	Transcript show: 'Total';tab;tab;tab;tab;show:'$';print: Total; cr.
+	Transcript show: 'Cobertura Obra social';tab;tab;show: '$';print: (self calcDescuento: Total y: coleccionPaciente porcCobertura) ;cr.
+        Transcript show: 'Neto a pagar       ';tab;tab;tab;show:'$';print: (self netoaPagar: Total y: coleccionPaciente porcCobertura) ;cr.
+	temp := Transcript contents asString.
+	^temp!
+
 existeCOD: unCOD
 |i int|
 int:= unCOD.
@@ -357,13 +429,6 @@ esp:= unaEspecialidad.
 e:= intervencion detect:[:i | i especialidad=esp] ifNone:[e:= 'no'.].
 (e='no') ifTrue: [^false] ifFalse: [^true ]!
 
-existeInterRegistDNI: unDNI
-| p pac|
-pac:=(self convertirCodigo: unDNI y: 0).
-p:= intervencionPaciente detect:[:i | i paciente=pac and: [i condicionPago = false]] ifNone:[p:= 'no'.].
-(p='no') ifTrue: [^false] ifFalse: [^p]
-!
-
 existeMatricula: unaMatricula
 | m med|
 med:= unaMatricula.
@@ -377,11 +442,32 @@ inicio
 	intervencionPaciente:= OrderedCollection new.
 	"AltaComplejidad cargaAdicional."
 
+	intervencionPaciente add: (IntervencionRegistrada new
+				precargaDatos: '05/23/2026' 
+				y: '44765236' 
+				y: '50925' 
+				y: '21'
+				y: false yourself).
+
+	medico add: (Medico new
+				precargaDatos: '50925'
+				y: 'diego'
+				y: 'gonzalez'
+				y: 'trauma'
+				y: true yourself).
+
+	paciente add: (Paciente new
+				precargaDatos: '44765236'
+				y: 'Manuel'
+				y: 'Variego'
+				y: 'OSDE'
+				y: 30 yourself).
+
 	intervencion add: (Intervencion new
-				precargaDatos: '01' 
-				y: 'Cirugía de corazón' 
-				y: 'Cardiología' 
-				y: 20000 yourself).
+				precargaDatos: '21' 
+				y: 'general' 
+				y: 'trauma' 
+				y: 50 yourself).
 
 	intervencion add: (AltaComplejidad new
 				precargaDatos: '02' 
@@ -472,27 +558,28 @@ coleccion := intervencion select: [:each | each especialidad=unaEspecialidad].
     ]!
 
 liquidacion
-|coleccion1 coleccion2 temp rta dni p|
-
+|coleccion2 rta dni|
 
 rta:=1.
-[rta] whileTrue:[
-	dni:=(Prompter prompt: 'Ingrese el DNI del paciente con intervenciones registradas').
-	p:=(self existeInterRegistDNI: dni).
-	(p ~= false) ifTrue:[
-		
+dni:=(Prompter prompt: 'Ingrese el DNI del paciente con intervenciones registradas').
+[rta = 1] whileTrue:[
+	coleccion2 := intervencionPaciente select: [:each | each paciente = dni].
+	(coleccion2 isEmpty) ifTrue: [
+	(MessageBox warning: 'No existe una intervencion pendiente de pago registrado con ese DNI. Intente nuevamente').
+] ifFalse: [
+	MessageBox notify: (self estadoliquidacion: dni).
+].
+	dni:=(Prompter prompt: 'Ingrese otro DNI o 0 para salir').
+	(dni = '0') ifTrue:[ rta:=0].
+].
+
+"messagebox notify: self listado liquidacion"
+	"paciente tiene intervencion registrada y condicion pago falso, p es paciente en intervencion registrada"
 		"listar paciente y obra social"
 		"listar fecha descripcion medico mat e importe"
-]
-ifFalse:[
-	(MessageBox warning: 'No existe una intervencion pendiente de pago registrado con ese DNI. Intente nuevamente')
-]
 
 
 
-
-
-]
 
 
 "
@@ -513,10 +600,6 @@ coleccion2:= coleccion1 select: [:each | each especialidad=unaEspecialidad].
 	temp:= (Transcript contents) asString.
 	^temp
     ]"!
-
-listar: coleccion
-Transcript cr;show: 'NOMBRE';tab;show:'LEGAJO';tab;show:'NOTA';cr.
-coleccion do: [:each | each muestra ]!
 
 medicosDisponibles: unaEspecialidad
 |coleccion1 coleccion2 temp|
@@ -573,6 +656,10 @@ op:=(Prompter prompt: 'Ingrese una opción:').
 
 !
 
+netoaPagar: unTotal y: unPorcentaje
+
+^(unTotal - (self calcDescuento: unTotal y: unPorcentaje)) !
+
 registrarIntervencion
 |rta rta2 t cod|
 
@@ -624,7 +711,7 @@ rta:= true.
 	].
 	
         p:= IntervencionRegistrada new.
-        p cargaDatos: fecha y: pac y:(self convertirCodigo: matricula y: 2 ) y: (self convertirCodigo: inter y: 1 ) y: (MessageBox confirm: '¿Está pagada?' ).
+        p cargaDatos: fecha y: pac y:matricula y: inter y: (MessageBox confirm: '¿Está pagada?' ).
         intervencionPaciente add: p.
         rta:= MessageBox confirm: '¿Desea registrar otra intervención?' caption:'Menú administrador > Registro > Intervención de paciente'
     ]].
@@ -677,24 +764,26 @@ int:=unaEspecialidad.
 m:= medico detect:[:i | i matricula=med and: [i especialidad=int and: [i condicion=true] ] ] ifNone:[m:= 'no'.].
 (m='no') ifTrue: [^false] ifFalse: [^true ]! !
 !Sanatorio categoriesForMethods!
+buscarEnColeccion:y:!public! !
+calcDescuento:y:!public! !
 consulta!public! !
 consultaIntervencion!public! !
 consultaMedico!public! !
 consultaPaciente!public! !
 convertirCodigo:y:!public! !
 esFechaValida:!public! !
+estadoliquidacion:!public! !
 existeCOD:!public! !
 existeDNI:!public! !
 existeEspecialidad:!public! !
-existeInterRegistDNI:!public! !
 existeMatricula:!public! !
 inicio!public! !
 intervencionesDisponibles:!public! !
 liquidacion!public! !
-listar:!public! !
 medicosDisponibles:!public! !
 menu!public! !
 menuAdmin!public! !
+netoaPagar:y:!public! !
 registrarIntervencion!public! !
 registrarIntervencionPaciente!public! !
 registrarMedico!public! !
