@@ -20,10 +20,10 @@ package globalAliases: (Set new
 	yourself).
 
 package setPrerequisites: #(
-	'C:\Users\Fringe\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\Base\Dolphin'
-	'C:\Users\Fringe\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\Base\Dolphin Legacy Date & Time'
-	'C:\Users\Fringe\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\Base\Dolphin Message Box'
-	'C:\Users\Fringe\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\MVP\Presenters\Prompters\Dolphin Prompter').
+	'..\..\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\Base\Dolphin'
+	'..\..\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\Base\Dolphin Legacy Date & Time'
+	'..\..\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\Base\Dolphin Message Box'
+	'..\..\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\MVP\Presenters\Prompters\Dolphin Prompter').
 
 package!
 
@@ -126,15 +126,24 @@ IntervencionRegistrada comment: ''!
 !IntervencionRegistrada categoriesForClass!Kernel-Objects! !
 !IntervencionRegistrada methodsFor!
 
-cargaDatos: unaFecha y: unPaciente y: unMedico y:unaIntervencion
+cargaDatos: unaFecha y: unPaciente y: unMedico y:unaIntervencion y:unaCondicion
 
 fecha:=unaFecha.
 paciente:=unPaciente.
 medico:=unMedico.
 intervencion:=unaIntervencion.
-condicionPago:=(MessageBox confirm: '¿Está pagada?' ).! !
+condicionPago:= unaCondicion.!
+
+condicionPago
+^condicionPago!
+
+paciente
+^paciente
+! !
 !IntervencionRegistrada categoriesForMethods!
-cargaDatos:y:y:y:!public! !
+cargaDatos:y:y:y:y:!public! !
+condicionPago!public! !
+paciente!public! !
 !
 
 Medico guid: (GUID fromString: '{2589d0d7-de77-4739-ac65-7d764c177c02}')!
@@ -348,6 +357,13 @@ esp:= unaEspecialidad.
 e:= intervencion detect:[:i | i especialidad=esp] ifNone:[e:= 'no'.].
 (e='no') ifTrue: [^false] ifFalse: [^true ]!
 
+existeInterRegistDNI: unDNI
+| p pac|
+pac:=(self convertirCodigo: unDNI y: 0).
+p:= intervencionPaciente detect:[:i | i paciente=pac and: [i condicionPago = false]] ifNone:[p:= 'no'.].
+(p='no') ifTrue: [^false] ifFalse: [^p]
+!
+
 existeMatricula: unaMatricula
 | m med|
 med:= unaMatricula.
@@ -456,8 +472,47 @@ coleccion := intervencion select: [:each | each especialidad=unaEspecialidad].
     ]!
 
 liquidacion
+|coleccion1 coleccion2 temp rta dni p|
 
-^ MessageBox notify: 'liquidacion'!
+
+rta:=1.
+[rta] whileTrue:[
+	dni:=(Prompter prompt: 'Ingrese el DNI del paciente con intervenciones registradas').
+	p:=(self existeInterRegistDNI: dni).
+	(p ~= false) ifTrue:[
+		
+		"listar paciente y obra social"
+		"listar fecha descripcion medico mat e importe"
+]
+ifFalse:[
+	(MessageBox warning: 'No existe una intervencion pendiente de pago registrado con ese DNI. Intente nuevamente')
+]
+
+
+
+
+
+]
+
+
+"
+coleccion1 := medico select: [:each | each condicion].
+coleccion2:= coleccion1 select: [:each | each especialidad=unaEspecialidad].
+(coleccion2 isEmpty) 
+    ifTrue:[MessageBox notify: 'No hay médicos disponibles.' ]
+    ifFalse: [
+	Transcript clear.
+	Transcript show: 'ESPECIALIDAD - '; show: unaEspecialidad asUppercase; cr.
+	Transcript show: 'MATRÍCULA'; tab; show:'PROFESIONAL'; cr.
+        coleccion2 do: [:each | 
+            Transcript 
+                show: each matricula; tab; tab;
+		show: each nombre; show: ' '; show: each apellido; tab; tab;
+                cr.
+        ].
+	temp:= (Transcript contents) asString.
+	^temp
+    ]"!
 
 listar: coleccion
 Transcript cr;show: 'NOMBRE';tab;show:'LEGAJO';tab;show:'NOTA';cr.
@@ -540,7 +595,7 @@ rta:= true.
 
 registrarIntervencionPaciente
 
-|rta p fecha inter med pac espe temp|
+|rta p fecha inter matricula pac espe|
 
 rta:= true.
 
@@ -553,23 +608,23 @@ rta:= true.
 	[self existeDNI: pac] whileFalse: [
 	      pac:= Prompter prompt: 'El documento ingresado no coincide con nuestros registros. Vuelva a intentarlo.' caption:'Menú administrador > Registro > Intervención de paciente'.
 	].
-	inter:= Prompter prompt: 'Ingrese la especialidad.' caption:'Menú administrador > Registro > Intervención de paciente'.
-	[self existeEspecialidad: inter ] whileFalse: [
-		inter:= Prompter prompt: 'Los datos ingresados no coinciden con nuestros registros. Vuelva a intentarlo.' caption:'Menú administrador > Registro > Intervención de paciente'.
+	espe:= Prompter prompt: 'Ingrese la especialidad.' caption:'Menú administrador > Registro > Intervención de paciente'.
+	[self existeEspecialidad: espe ] whileFalse: [
+		espe:= Prompter prompt: 'Los datos ingresados no coinciden con nuestros registros. Vuelva a intentarlo.' caption:'Menú administrador > Registro > Intervención de paciente'.
 	].
-	temp:= MessageBox notify:(self medicosDisponibles: inter).
-	med:= Prompter prompt: 'Ingrese la matrícula del profesional' caption:'Menú administrador > Registro > Intervención de paciente'.
-	[self validarMedico: med y: inter] whileFalse: [
-		med:= Prompter prompt: 'La matrícula ingresada no coincide con nuestros registros. Vuelva a intentarlo.' caption:'Menú administrador > Registro > Intervención de paciente'.
+	MessageBox notify:(self medicosDisponibles: espe).
+	matricula:= Prompter prompt: 'Ingrese la matrícula del profesional' caption:'Menú administrador > Registro > Intervención de paciente'.
+	[self validarMedico: matricula y: espe] whileFalse: [
+		matricula:= Prompter prompt: 'La matrícula ingresada no coincide con nuestros registros. Vuelva a intentarlo.' caption:'Menú administrador > Registro > Intervención de paciente'.
 	].
-	temp:= MessageBox notify:(self intervencionesDisponibles: inter).
-	espe:= Prompter prompt: 'Ingrese el código de intervención' caption:'Menú administrador > Registro > Intervención de paciente'.
-	[self validarIntervencion: espe y: inter] whileFalse: [
+	MessageBox notify:(self intervencionesDisponibles: espe).
+	inter:= Prompter prompt: 'Ingrese el código de intervención' caption:'Menú administrador > Registro > Intervención de paciente'.
+	[self validarIntervencion: inter y: espe] whileFalse: [
 		espe:= Prompter prompt: 'El código de intervención ingresado no coincide con nuestros registros. Vuelva a intentarlo.' caption:'Menú administrador > Registro > Intervención de paciente'.
 	].
 	
         p:= IntervencionRegistrada new.
-        p cargaDatos: fecha y: pac y:(self convertirCodigo: espe y: 2 ) y: (self convertirCodigo: espe y: 1 ).
+        p cargaDatos: fecha y: pac y:(self convertirCodigo: matricula y: 2 ) y: (self convertirCodigo: inter y: 1 ) y: (MessageBox confirm: '¿Está pagada?' ).
         intervencionPaciente add: p.
         rta:= MessageBox confirm: '¿Desea registrar otra intervención?' caption:'Menú administrador > Registro > Intervención de paciente'
     ]].
@@ -631,6 +686,7 @@ esFechaValida:!public! !
 existeCOD:!public! !
 existeDNI:!public! !
 existeEspecialidad:!public! !
+existeInterRegistDNI:!public! !
 existeMatricula:!public! !
 inicio!public! !
 intervencionesDisponibles:!public! !
