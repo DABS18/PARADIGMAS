@@ -1,5 +1,5 @@
 ﻿| package |
-package := Package name: 'Trabajo Práctico G9 Funcional'.
+package := Package name: 'Trabajo Práctico G9'.
 package paxVersion: 1;
 	basicComment: ''.
 
@@ -80,12 +80,17 @@ arancel
 ^arancel!
 
 cargaDatos: unCod
-
-
+|temp|
 codigo:=unCod.
 descripcion:=(Prompter prompt: 'Ingrese la descripcion').
 especialidad:=(Prompter prompt: 'Ingrese la especialidad').
-arancel:=(Prompter prompt: 'Ingrese el arancel') asNumber asFloat.
+(temp:=(Prompter prompt: 'Ingrese el arancel')).
+[((self esFlotante: temp)=false)] whileTrue: [
+	MessageBox errorMsg: 'Debe ingresar un número'.
+	temp:=(Prompter prompt: 'Ingrese el arancel').
+	((self esFlotante: temp))
+].
+arancel:=temp asNumber asFloat.
 
 !
 
@@ -94,6 +99,12 @@ codigo
 
 descripcion
 ^descripcion!
+
+esFlotante: unNumero
+    |temp |
+    temp := true.
+    [(unNumero asNumber asFloat)]  on: Error do: [:each | temp:= false].
+    ^ temp!
 
 especialidad
 ^especialidad!
@@ -116,9 +127,21 @@ arancel!public! !
 cargaDatos:!public! !
 codigo!public! !
 descripcion!public! !
+esFlotante:!public! !
 especialidad!public! !
 muestra!public! !
 precargaDatos:y:y:y:!public! !
+!
+
+!Intervencion class methodsFor!
+
+esFlotante: unNumero
+    |temp |
+    temp := true.
+    [(unNumero asNumber asFloat)]  on: Error do: [:each | temp:= false].
+    ^ temp! !
+!Intervencion class categoriesForMethods!
+esFlotante:!public! !
 !
 
 IntervencionRegistrada guid: (GUID fromString: '{e572bfc1-8db5-432d-a93c-cb49ed4d6a0b}')!
@@ -192,6 +215,14 @@ apellido:=(Prompter prompt: 'Ingrese el apellido').
 especialidad:=(Prompter prompt: 'Ingrese la especialidad').
 condicion:=(MessageBox confirm:'¿Está disponible?').!
 
+cargaDatos: unaMatricula y: unaEspecialidad y: unaDisponibilidad
+
+matricula:=unaMatricula.
+nombre:=(Prompter prompt: 'Ingrese el nombre').
+apellido:=(Prompter prompt: 'Ingrese el apellido').
+especialidad:=unaEspecialidad.
+condicion:=unaDisponibilidad.!
+
 condicion
 
 ^condicion!
@@ -228,6 +259,7 @@ condicion:=unaCondicion.! !
 !Medico categoriesForMethods!
 apellido!public! !
 cargaDatos:!public! !
+cargaDatos:y:y:!public! !
 condicion!public! !
 especialidad!public! !
 matricula!public! !
@@ -246,17 +278,31 @@ apellido
 
 cargaDatos: unDni
 
-|ob|
+|ob temp|
 dni:=unDni.
 nombre:=(Prompter prompt: 'Ingrese el nombre').
 apellido:=(Prompter prompt: 'Ingrese el apellido').
 ob:=(MessageBox confirm:'¿Usted posee obra social?').
-ob ifTrue: [obraSocial:=(Prompter prompt: 'Ingrese el nombre de su obra social'). porcCobertura:=(Prompter prompt: 'Ingrese el porcentaje de cobertura') asNumber asFloat].
+ob ifTrue: [obraSocial:=(Prompter prompt: 'Ingrese el nombre de su obra social'). 
+(temp:=(Prompter prompt: 'Ingrese el porcentaje de cobertura')).
+[((self esFlotante: temp)=false)] whileTrue: [
+	MessageBox errorMsg: 'Debe ingresar un número'.
+	temp:=(Prompter prompt: 'Ingrese el porcentaje de cobertura').
+	((self esFlotante: temp))
+].
+porcCobertura:=temp asNumber asFloat.
+].
 ob ifFalse: [obraSocial:='No posee Obra Social'. porcCobertura:=0].
 !
 
 dni
 ^dni!
+
+esFlotante: unNumero
+    |temp |
+    temp := true.
+    [(unNumero asNumber asFloat)]  on: Error do: [:each | temp:= false].
+    ^ temp!
 
 muestra
 
@@ -292,6 +338,7 @@ porcCobertura:= unPorc.! !
 apellido!public! !
 cargaDatos:!public! !
 dni!public! !
+esFlotante:!public! !
 muestra!public! !
 nombre!public! !
 obraSocial!public! !
@@ -403,7 +450,7 @@ estadoliquidacion: unDNI
 	coleccionPaciente:= (self buscarEnColeccion: unDNI y: paciente).	
 	coleccion2 := intervencionPaciente select:[:each | each paciente = unDNI and:[each condicionPago = false]].
 	Transcript clear.
-	Transcript show: 'Liquidacion del paciente: ';show: coleccionPaciente nombre;show: ' ';show: coleccionPaciente apellido;show: '  Obra social:  '; show: coleccionPaciente obraSocial; cr.
+	Transcript show: 'Liquidación del paciente: ';show: coleccionPaciente nombre;show: ' ';show: coleccionPaciente apellido;show: '  Obra social:  '; show: coleccionPaciente obraSocial; cr.
 	Transcript show: 'Fecha';tab; show: 'Descripcion      ';show: 'Medico';tab; show: 'Mat.';tab; show: 'Importe'; cr.
         coleccion2 do: [:i |
 	    tempInt:= (self buscarEnColeccion: (i intervencion) y: intervencion).
@@ -449,7 +496,7 @@ inicio
 	medico := OrderedCollection new.
 	intervencion := OrderedCollection new.
 	intervencionPaciente:= OrderedCollection new.
-	"AltaComplejidad cargaAdicional."
+	"AltaComplejidad cargaAdicional.
 
 	intervencionPaciente add: (IntervencionRegistrada new
 				precargaDatos: '05/23/2026' 
@@ -495,7 +542,7 @@ inicio
 				precargaDatos: '04' 
 				y: 'Artroscopia de rodilla' 
 				y: 'Ortopedia'
-				y: 7000 yourself).
+				y: 7000 yourself)."
 
 	paciente add: (Paciente new
 				precargaDatos: '01'
@@ -728,7 +775,7 @@ rta:= true.
 
 registrarMedico
 
-|rta m matricula|
+|rta m matricula especialidad disponibilidad|
 
 rta:= true.
 
@@ -737,11 +784,19 @@ rta:= true.
     (self existeMatricula: matricula) ifTrue: [
         MessageBox warning: 'La matrícula ya existe. Por favor, ingrese otra.' caption:'Menú administrador > Registro > Médico'.
     ] ifFalse: [
+	especialidad := (Prompter prompt: 'Ingrese la especialidad' caption:'Menú administrador > Registro > Médico').
+	disponibilidad := (MessageBox confirm: '¿Está disponible?' caption:'Menú administrador > Registro > Médico').
+	((self existeEspecialidad: especialidad)=false and:[disponibilidad=false]) ifTrue: [
+	MessageBox warning: 'Debe haber un médico disponible por cada especialidad' caption:'Menú administrador > Registro > Médico'.
+	]
+	ifFalse:[
         m:= Medico new.
-        m cargaDatos: matricula .
+        m cargaDatos: matricula y: especialidad y: disponibilidad.
         medico add: m.
-        rta:= MessageBox confirm: '¿Desea ingresar otro médico?'  caption:'Menú administrador > Registro > Médico'
-    ]].
+    ].
+	rta:= MessageBox confirm: '¿Desea ingresar otro médico?'  caption:'Menú administrador > Registro > Médico'.
+].
+].
 !
 
 registrarPaciente
@@ -824,8 +879,14 @@ adicional
 ^Adicional!
 
 cargaAdicional
-
-Adicional:= (Prompter prompt: 'Ingrese el porcentaje adicional') asNumber asFloat.!
+|temp|
+(temp:=(Prompter prompt: 'Ingrese el adicional')).
+[((super esFlotante: temp)=false)] whileTrue: [
+	MessageBox errorMsg: 'Debe ingresar un número'.
+	temp:=(Prompter prompt: 'Ingrese el adicional').
+	((super esFlotante: temp)).
+].
+Adicional:=temp asNumber asFloat.!
 
 precargaAdicional: unAdic
 
