@@ -20,10 +20,10 @@ package globalAliases: (Set new
 	yourself).
 
 package setPrerequisites: #(
-	'C:\Users\Fringe\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\Base\Dolphin'
-	'C:\Users\Fringe\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\Base\Dolphin Legacy Date & Time'
-	'C:\Users\Fringe\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\Base\Dolphin Message Box'
-	'C:\Users\Fringe\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\MVP\Presenters\Prompters\Dolphin Prompter').
+	'C:\Users\IPP\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\Base\Dolphin'
+	'C:\Users\IPP\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\Base\Dolphin Legacy Date & Time'
+	'C:\Users\IPP\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\Base\Dolphin Message Box'
+	'C:\Users\IPP\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\MVP\Presenters\Prompters\Dolphin Prompter').
 
 package!
 
@@ -149,14 +149,6 @@ IntervencionRegistrada comment: ''!
 !IntervencionRegistrada categoriesForClass!Kernel-Objects! !
 !IntervencionRegistrada methodsFor!
 
-cargaDatos: unaFecha y: unPaciente y: unMedico y:unaIntervencion
-
-fecha:=unaFecha.
-paciente:=unPaciente.
-medico:=unMedico.
-intervencion:=unaIntervencion.
-condicionPago:=(MessageBox confirm: '¿Está pagada?' ).!
-
 cargaDatos: unaFecha y: unPaciente y: unMedico y:unaIntervencion y:unaCondicion
 
 fecha:=unaFecha.
@@ -189,7 +181,6 @@ medico:=unMedico.
 intervencion:=unaIntervencion.
 condicionPago:= unaCondicion.! !
 !IntervencionRegistrada categoriesForMethods!
-cargaDatos:y:y:y:!public! !
 cargaDatos:y:y:y:y:!public! !
 condicionPago!public! !
 fecha!public! !
@@ -420,21 +411,6 @@ ifNone:[ MessageBox notify: 'Incorrecto. Vuelva a ingresar el DNI o escriba SALI
 
 (p isNil) ifFalse: [p muestra].!
 
-convertirCodigo: unCodigo y: unaOpcion
-|i|
-(unaOpcion=1) ifTrue: [
-    i:= intervencion detect:[:each | each codigo=unCodigo].
-    ^ (i descripcion) printString.
-] ifFalse:[
-(unaOpcion=2) ifTrue:[
-    i:= medico detect:[:each | each matricula=unCodigo].
-    ^ (i nombre, ' ' , i apellido) printString .
-] ifFalse:[
-    i:= paciente detect:[:each | each dni=unCodigo].
-    ^ (i nombre, ' ' , i apellido) printString .
-]
-]!
-
 esFechaValida: unaFecha
     | fechaHoy fecha temp |
     fecha := [Date fromString: unaFecha format: 'MM/DD/yyyy']  on: Error do: [:each | temp:= false].
@@ -445,8 +421,9 @@ esFechaValida: unaFecha
   !
 
 estadoliquidacion: unDNI
-	|temp coleccionPaciente coleccion2 tempInt tempMed Total|
-	Total:= 0.
+	|coleccionPaciente coleccion2 tempInt tempMed acumAdic total nodebe|
+	total:= 0.
+	acumAdic:=0.
 	coleccionPaciente:= (self buscarEnColeccion: unDNI y: paciente).	
 	coleccion2 := intervencionPaciente select:[:each | each paciente = unDNI and:[each condicionPago = false]].
 	Transcript clear.
@@ -454,16 +431,17 @@ estadoliquidacion: unDNI
 	Transcript show: 'Fecha';tab; show: 'Descripcion      ';show: 'Medico';tab; show: 'Mat.';tab; show: 'Importe'; cr.
         coleccion2 do: [:i |
 	    tempInt:= (self buscarEnColeccion: (i intervencion) y: intervencion).
-	    tempMed:= (self buscarEnColeccion: (i medico) y: medico).
+	    tempMed:= (self buscarEnColeccion: (i medico) y: medico).	
             Transcript show: i fecha;show: '    '; show: tempInt descripcion;show: '   ' ;show: tempMed nombre;show:' ';show: tempMed apellido;show: '   '; show: tempMed matricula;show: '   ';show: '$'; print: tempInt arancel; tab; tab;
                 cr.
-	(tempInt isKindOf: AltaComplejidad) ifTrue: [Total:= Total + (tempInt arancel) + ( AltaComplejidad adicional)] ifFalse: [Total:= Total + (tempInt arancel)]
+	(tempInt isKindOf: AltaComplejidad) ifTrue: [total:= total + (tempInt arancel) + ( AltaComplejidad adicional). acumAdic:= AltaComplejidad adicional + acumAdic ] ifFalse: [total:= total + (tempInt arancel)]
         ].
-	Transcript show: 'Total';tab;tab;tab;tab;show:'$';print: Total; cr.
-	Transcript show: 'Cobertura Obra social';tab;tab;show: '$';print: (self calcDescuento: Total y: coleccionPaciente porcCobertura) ;cr.
-        Transcript show: 'Neto a pagar       ';tab;tab;tab;show:'$';print: (self netoaPagar: Total y: coleccionPaciente porcCobertura) ;cr.
-	temp := Transcript contents asString.
-	^temp!
+	Transcript cr; show: 'Carga por Adicional';tab;tab;tab;show:'$';print: acumAdic; cr.
+	Transcript show: 'Total';tab;tab;tab;tab;show:'$';print: total; cr.
+	Transcript show: 'Cobertura Obra social';tab;tab;show: '$';print: (self calcDescuento: total y: coleccionPaciente porcCobertura) ;cr.
+        Transcript show: 'Neto a pagar       ';tab;tab;tab;show:'$';print: (self netoaPagar: total y: coleccionPaciente porcCobertura) ;cr.
+	
+	(total = 0) ifTrue: [^'Este paciente no registra deudas'] ifFalse:[^(Transcript contents) asString].!
 
 existeCOD: unCOD
 |i int|
@@ -480,9 +458,8 @@ p:= paciente detect:[:i | i dni=pac] ifNone:[p:= 'no'.].
 !
 
 existeEspecialidad: unaEspecialidad
-|e esp|
-esp:= unaEspecialidad.
-e:= intervencion detect:[:i | i especialidad=esp] ifNone:[e:= 'no'.].
+|e|
+e:= intervencion detect:[:i | i especialidad=unaEspecialidad] ifNone:[e:= 'no'.].
 (e='no') ifTrue: [^false] ifFalse: [^true ]!
 
 existeMatricula: unaMatricula
@@ -518,13 +495,13 @@ inicio
 				y: 'Variego'
 				y: 'OSDE'
 				y: 30 yourself).
-
+"
 	intervencion add: (Intervencion new
 				precargaDatos: '21' 
 				y: 'general' 
 				y: 'trauma' 
 				y: 50 yourself).
-
+"
 	intervencion add: (AltaComplejidad new
 				precargaDatos: '02' 
 				y: 'Trasplante de riñón' 
@@ -543,7 +520,7 @@ inicio
 				y: 'Artroscopia de rodilla' 
 				y: 'Ortopedia'
 				y: 7000 yourself)."
-
+"
 	paciente add: (Paciente new
 				precargaDatos: '01'
 				y: 'Joel'
@@ -591,7 +568,8 @@ inicio
 				y: 'Roberto'
 				y: 'Neuross'
 				y: 'Neurología'
-				y: false yourself)!
+				y: false yourself)
+"!
 
 intervencionesDisponibles: unaEspecialidad
 |coleccion temp|
@@ -677,6 +655,28 @@ coleccion2:= coleccion1 select: [:each | each especialidad=unaEspecialidad].
 	^temp
     ]!
 
+medicosDisponibles: unaEspecialidad y: unaOpcion
+|coleccion1 coleccion2 temp temp2|
+coleccion1 := medico select: [:each | each condicion].
+coleccion2:= coleccion1 select: [:each | each especialidad=unaEspecialidad].
+(coleccion2 isEmpty) 
+    ifTrue:[MessageBox notify: 'No hay médicos disponibles.'. temp2:=false.]
+    ifFalse: [
+	Transcript clear.
+	Transcript show: 'ESPECIALIDAD - '; show: unaEspecialidad asUppercase; cr.
+	Transcript show: 'MATRÍCULA'; tab; show:'PROFESIONAL'; cr.
+        coleccion2 do: [:each | 
+            Transcript 
+                show: each matricula; tab; tab;
+		show: each nombre; show: ' '; show: each apellido; tab; tab;
+                cr.
+        ].
+	temp2=true.
+	temp:= (Transcript contents) asString.
+    ].
+
+(unaOpcion=1)ifTrue:[^temp] ifFalse:[^temp2]!
+
 menu
 |op|
 
@@ -741,7 +741,7 @@ registrarIntervencionPaciente
 |rta p fecha inter matricula pac espe|
 
 rta:= true.
-
+(paciente isEmpty or: [intervencion isEmpty or: [medico isEmpty]]) ifTrue: [MessageBox errorMsg: 'BASE DE DATOS VACIA.' caption: 'Error del sistema'] ifFalse: [
 [rta] whileTrue: [
     fecha := (Prompter prompt: 'Ingrese una fecha. (MM/DD/YYYY)' caption:'Menú administrador > Registro > Intervención de paciente').
     (self esFechaValida: fecha) ifFalse: [
@@ -758,19 +758,23 @@ rta:= true.
 	MessageBox notify:(self medicosDisponibles: espe).
 	matricula:= Prompter prompt: 'Ingrese la matrícula del profesional' caption:'Menú administrador > Registro > Intervención de paciente'.
 	[self validarMedico: matricula y: espe] whileFalse: [
-		matricula:= Prompter prompt: 'La matrícula ingresada no coincide con nuestros registros. Vuelva a intentarlo.' caption:'Menú administrador > Registro > Intervención de paciente'.
+		MessageBox warning:('La matrícula ingresada no coincide con nuestros registros. Vuelva a intentarlo.') caption:'Menú administrador > Registro > Intervención de paciente'.
+		MessageBox notify:(self medicosDisponibles: espe).
+		matricula:= Prompter prompt: 'Ingrese la matrícula del profesional.' caption:'Menú administrador > Registro > Intervención de paciente'.
 	].
 	MessageBox notify:(self intervencionesDisponibles: espe).
 	inter:= Prompter prompt: 'Ingrese el código de intervención' caption:'Menú administrador > Registro > Intervención de paciente'.
 	[self validarIntervencion: inter y: espe] whileFalse: [
-		espe:= Prompter prompt: 'El código de intervención ingresado no coincide con nuestros registros. Vuelva a intentarlo.' caption:'Menú administrador > Registro > Intervención de paciente'.
+		MessageBox warning:('El código de intervención ingresado no coincide con nuestros registros. Vuelva a intentarlo.') caption:'Menú administrador > Registro > Intervención de paciente'.
+		MessageBox notify:(self intervencionesDisponibles: espe).
+		espe:= Prompter prompt: 'Ingrese el código de intervención' caption:'Menú administrador > Registro > Intervención de paciente'.
 	].
 	
         p:= IntervencionRegistrada new.
         p cargaDatos: fecha y: pac y:matricula y: inter y: (MessageBox confirm: '¿Está pagada?' ).
         intervencionPaciente add: p.
         rta:= MessageBox confirm: '¿Desea registrar otra intervención?' caption:'Menú administrador > Registro > Intervención de paciente'
-    ]].
+    ]]].
 !
 
 registrarMedico
@@ -786,7 +790,7 @@ rta:= true.
     ] ifFalse: [
 	especialidad := (Prompter prompt: 'Ingrese la especialidad' caption:'Menú administrador > Registro > Médico').
 	disponibilidad := (MessageBox confirm: '¿Está disponible?' caption:'Menú administrador > Registro > Médico').
-	((self existeEspecialidad: especialidad)=false and:[disponibilidad=false]) ifTrue: [
+	(((self existeEspecialidad: especialidad)=false and:[disponibilidad=false]) or:[((self medicosDisponibles: especialidad y: 2)=false) and:[disponibilidad=false]]) ifTrue: [
 	MessageBox warning: 'Debe haber un médico disponible por cada especialidad' caption:'Menú administrador > Registro > Médico'.
 	]
 	ifFalse:[
@@ -834,7 +838,6 @@ consulta!public! !
 consultaIntervencion!public! !
 consultaMedico!public! !
 consultaPaciente!public! !
-convertirCodigo:y:!public! !
 esFechaValida:!public! !
 estadoliquidacion:!public! !
 existeCOD:!public! !
@@ -845,6 +848,7 @@ inicio!public! !
 intervencionesDisponibles:!public! !
 liquidacion!public! !
 medicosDisponibles:!public! !
+medicosDisponibles:y:!public! !
 menu!public! !
 menuAdmin!public! !
 netoaPagar:y:!public! !
