@@ -20,10 +20,10 @@ package globalAliases: (Set new
 	yourself).
 
 package setPrerequisites: #(
-	'C:\Users\IPP\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\Base\Dolphin'
-	'C:\Users\IPP\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\Base\Dolphin Legacy Date & Time'
-	'C:\Users\IPP\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\Base\Dolphin Message Box'
-	'C:\Users\IPP\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\MVP\Presenters\Prompters\Dolphin Prompter').
+	'C:\Users\Fringe\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\Base\Dolphin'
+	'C:\Users\Fringe\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\Base\Dolphin Legacy Date & Time'
+	'C:\Users\Fringe\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\Base\Dolphin Message Box'
+	'C:\Users\Fringe\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\MVP\Presenters\Prompters\Dolphin Prompter').
 
 package!
 
@@ -94,6 +94,21 @@ arancel:=temp asNumber asFloat.
 
 !
 
+cargaDatos: unCod y: unaEspecialidad
+|temp|
+codigo:=unCod.
+descripcion:=(Prompter prompt: 'Ingrese la descripcion').
+especialidad:=unaEspecialidad.
+(temp:=(Prompter prompt: 'Ingrese el arancel')).
+[((self esFlotante: temp)=false)] whileTrue: [
+	MessageBox errorMsg: 'Debe ingresar un número'.
+	temp:=(Prompter prompt: 'Ingrese el arancel').
+	((self esFlotante: temp))
+].
+arancel:=temp asNumber asFloat.
+
+!
+
 codigo
 ^codigo!
 
@@ -125,6 +140,7 @@ precargaDatos: unCod y: unaDesc y: unaEsp y: unArancel
 !Intervencion categoriesForMethods!
 arancel!public! !
 cargaDatos:!public! !
+cargaDatos:y:!public! !
 codigo!public! !
 descripcion!public! !
 esFlotante:!public! !
@@ -427,12 +443,12 @@ estadoliquidacion: unDNI
 	coleccionPaciente:= (self buscarEnColeccion: unDNI y: paciente).	
 	coleccion2 := intervencionPaciente select:[:each | each paciente = unDNI and:[each condicionPago = false]].
 	Transcript clear.
-	Transcript show: 'Liquidación del paciente: ';show: coleccionPaciente nombre;show: ' ';show: coleccionPaciente apellido;show: '  Obra social:  '; show: coleccionPaciente obraSocial; cr.
-	Transcript show: 'Fecha';tab; show: 'Descripcion      ';show: 'Medico';tab; show: 'Mat.';tab; show: 'Importe'; cr.
+	Transcript show: 'Paciente: ';show: coleccionPaciente nombre;show: ' ';show: coleccionPaciente apellido;show: '  Obra social:  '; show: coleccionPaciente obraSocial; cr.
+	Transcript show:'      ';show: 'Fecha';tab; show: '      Descripcion         ';show: ' Medico   ';tab; show: '       Mat.   '; show: 'Importe'; cr.
         coleccion2 do: [:i |
 	    tempInt:= (self buscarEnColeccion: (i intervencion) y: intervencion).
 	    tempMed:= (self buscarEnColeccion: (i medico) y: medico).	
-            Transcript show: i fecha;show: '    '; show: tempInt descripcion;show: '   ' ;show: tempMed nombre;show:' ';show: tempMed apellido;show: '   '; show: tempMed matricula;show: '   ';show: '$'; print: tempInt arancel; tab; tab;
+            Transcript show: i fecha;show: '    '; show: tempInt descripcion;show: '   ' ;show: tempMed nombre;show:' ';show: tempMed apellido;show: '   '; show: tempMed matricula;show: '   ';show:'  ';show: '$'; print: tempInt arancel; tab; tab;
                 cr.
 	(tempInt isKindOf: AltaComplejidad) ifTrue: [total:= total + (tempInt arancel) + ( AltaComplejidad adicional). acumAdic:= AltaComplejidad adicional + acumAdic ] ifFalse: [total:= total + (tempInt arancel)]
         ].
@@ -495,13 +511,13 @@ inicio
 				y: 'Variego'
 				y: 'OSDE'
 				y: 30 yourself).
-"
+
 	intervencion add: (Intervencion new
 				precargaDatos: '21' 
 				y: 'general' 
 				y: 'trauma' 
 				y: 50 yourself).
-"
+
 	intervencion add: (AltaComplejidad new
 				precargaDatos: '02' 
 				y: 'Trasplante de riñón' 
@@ -601,7 +617,7 @@ dni:=(Prompter prompt: 'Ingrese el DNI del paciente con intervenciones registrad
 	(coleccion2 isEmpty) ifTrue: [
 	(MessageBox warning: 'No existe una intervencion pendiente de pago registrado con ese DNI. Intente nuevamente').
 ] ifFalse: [
-	MessageBox notify: (self estadoliquidacion: dni).
+	MessageBox notify: (self estadoliquidacion: dni) caption: 'LIQUIDACIÓN'.
 ].
 	dni:=(Prompter prompt: 'Ingrese otro DNI o 0 para salir').
 	(dni = '0') ifTrue:[ rta:=0].
@@ -635,32 +651,12 @@ coleccion2:= coleccion1 select: [:each | each especialidad=unaEspecialidad].
 	^temp
     ]"!
 
-medicosDisponibles: unaEspecialidad
-|coleccion1 coleccion2 temp|
-coleccion1 := medico select: [:each | each condicion].
-coleccion2:= coleccion1 select: [:each | each especialidad=unaEspecialidad].
-(coleccion2 isEmpty) 
-    ifTrue:[MessageBox notify: 'No hay médicos disponibles.' ]
-    ifFalse: [
-	Transcript clear.
-	Transcript show: 'ESPECIALIDAD - '; show: unaEspecialidad asUppercase; cr.
-	Transcript show: 'MATRÍCULA'; tab; show:'PROFESIONAL'; cr.
-        coleccion2 do: [:each | 
-            Transcript 
-                show: each matricula; tab; tab;
-		show: each nombre; show: ' '; show: each apellido; tab; tab;
-                cr.
-        ].
-	temp:= (Transcript contents) asString.
-	^temp
-    ]!
-
 medicosDisponibles: unaEspecialidad y: unaOpcion
 |coleccion1 coleccion2 temp temp2|
 coleccion1 := medico select: [:each | each condicion].
 coleccion2:= coleccion1 select: [:each | each especialidad=unaEspecialidad].
 (coleccion2 isEmpty) 
-    ifTrue:[MessageBox notify: 'No hay médicos disponibles.'. temp2:=false.]
+    ifTrue:[(unaOpcion =1) ifTrue: [MessageBox notify: 'No hay médicos disponibles.'.].  temp2:=false.]
     ifFalse: [
 	Transcript clear.
 	Transcript show: 'ESPECIALIDAD - '; show: unaEspecialidad asUppercase; cr.
@@ -717,24 +713,28 @@ netoaPagar: unTotal y: unPorcentaje
 ^(unTotal - (self calcDescuento: unTotal y: unPorcentaje)) !
 
 registrarIntervencion
-|rta rta2 t cod|
+|rta rta2 t cod especialidad|
 
 rta:= true.
 
-(intervencion isEmpty) ifTrue: [AltaComplejidad cargaAdicional].
+(intervencion isEmpty) ifTrue: [AltaComplejidad cargaAdicional. MessageBox notify: 'Adicional agregado con éxito' .].
 [rta] whileTrue: [
     cod := (Prompter prompt: 'Ingrese el codigo' caption:'Menú administrador > Registro > Intervención').
     (self existeCOD: cod) ifTrue: [
         MessageBox warning: 'El codigo ya existe. Por favor, ingrese otro.' caption:'Menú administrador > Registro > Intervención'.
     ] ifFalse: [
-        rta2 := MessageBox confirm: '¿Es una intervencion de alta complejidad?' caption:'Menú administrador > Registro > Intervención'.
+        especialidad:=(Prompter prompt: 'Ingrese la especialidad').
+	((self medicosDisponibles: especialidad y: 2)=false) ifTrue: [MessageBox warning: 'No hay médicos disponibles para esa especialidad.' caption:'Menú administrador > Registro > Intervención'.]
+	ifFalse:[
+	rta2 := MessageBox confirm: '¿Es una intervencion de alta complejidad?' caption:'Menú administrador > Registro > Intervención'.
         t := rta2
             ifTrue: [AltaComplejidad new]
             ifFalse: [Intervencion new].
-        t cargaDatos: cod .
+        t cargaDatos: cod y: especialidad.
         intervencion add: t.
-        rta:= MessageBox confirm: 'Desea ingresar otra intervencion?' caption:'Menú administrador > Registro > Intervención'
-    ]].!
+    ].
+	rta:= MessageBox confirm: '¿Desea ingresar otra intervencion?' caption:'Menú administrador > Registro > Intervención'
+]].!
 
 registrarIntervencionPaciente
 
@@ -755,11 +755,11 @@ rta:= true.
 	[self existeEspecialidad: espe ] whileFalse: [
 		espe:= Prompter prompt: 'Los datos ingresados no coinciden con nuestros registros. Vuelva a intentarlo.' caption:'Menú administrador > Registro > Intervención de paciente'.
 	].
-	MessageBox notify:(self medicosDisponibles: espe).
+	MessageBox notify:(self medicosDisponibles: espe y: 1).
 	matricula:= Prompter prompt: 'Ingrese la matrícula del profesional' caption:'Menú administrador > Registro > Intervención de paciente'.
 	[self validarMedico: matricula y: espe] whileFalse: [
 		MessageBox warning:('La matrícula ingresada no coincide con nuestros registros. Vuelva a intentarlo.') caption:'Menú administrador > Registro > Intervención de paciente'.
-		MessageBox notify:(self medicosDisponibles: espe).
+		MessageBox notify:(self medicosDisponibles: espe y: 1).
 		matricula:= Prompter prompt: 'Ingrese la matrícula del profesional.' caption:'Menú administrador > Registro > Intervención de paciente'.
 	].
 	MessageBox notify:(self intervencionesDisponibles: espe).
@@ -847,7 +847,6 @@ existeMatricula:!public! !
 inicio!public! !
 intervencionesDisponibles:!public! !
 liquidacion!public! !
-medicosDisponibles:!public! !
 medicosDisponibles:y:!public! !
 menu!public! !
 menuAdmin!public! !
