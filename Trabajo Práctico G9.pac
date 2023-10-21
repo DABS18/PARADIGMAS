@@ -20,10 +20,10 @@ package globalAliases: (Set new
 	yourself).
 
 package setPrerequisites: #(
-	'C:\Users\Fringe\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\Base\Dolphin'
-	'C:\Users\Fringe\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\Base\Dolphin Legacy Date & Time'
-	'C:\Users\Fringe\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\Base\Dolphin Message Box'
-	'C:\Users\Fringe\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\MVP\Presenters\Prompters\Dolphin Prompter').
+	'..\..\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\Base\Dolphin'
+	'..\..\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\Base\Dolphin Legacy Date & Time'
+	'..\..\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\Base\Dolphin Message Box'
+	'..\..\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\MVP\Presenters\Prompters\Dolphin Prompter').
 
 package!
 
@@ -392,7 +392,7 @@ Sanatorio comment: ''!
 
 buscarEnColeccion: unValor y: unaColeccion
 |temp|
-
+"Recorre una coleccion y detecta el valor ingresado, si lo encuentra devuelve un objeto de esa coleccion."
 (unaColeccion = intervencion) ifTrue:[
 	temp:= unaColeccion detect:[:i | i codigo = unValor]  
 ].
@@ -488,11 +488,13 @@ estadoliquidacion: unDNI
 	Transcript clear.
 	Transcript show: 'Paciente: ';show: coleccionPaciente nombre;show: ' ';show: coleccionPaciente apellido;show: '  Obra social:  '; show: coleccionPaciente obraSocial; cr.
 	Transcript show:'';show: 'Fecha';tab; show: '      Descripcion         ';show: ' Medico   ';tab; show: '       Mat.   '; show: 'Importe'; cr.
+	"Recorre la coleccion intervencionpaciente filtrada con un DNI y una condicionpago false, invoca el metodo buscarencoleccion que retorna una instancia de la coleccion intervencion y medico respectivamente."
         coleccion2 do: [:i |
 	    tempInt:= (self buscarEnColeccion: (i intervencion) y: intervencion).
 	    tempMed:= (self buscarEnColeccion: (i medico) y: medico).	
             Transcript show: i fecha;show: '    '; show: tempInt descripcion;show: '   ' ;show: tempMed nombre;show:' ';show: tempMed apellido;show: '   '; show: tempMed matricula;show: '   ';show:'  ';show: '$'; print: tempInt arancel; tab; tab;
                 cr.
+	"Evalua si la intervencion es de altacomplejidad, si es le calcula el arancel junto con el porcentaje de alta complejidad."
 	(tempInt isKindOf: AltaComplejidad) ifTrue: [total:= total + ((tempInt arancel)*(1+( AltaComplejidad adicional/100))). acumAdic:= (((tempInt arancel)*(1+( AltaComplejidad adicional/100)))-tempInt arancel) + acumAdic ] ifFalse: [total:= total + (tempInt arancel)]
         ].
 	Transcript cr; show: 'Carga por Adicional';tab;tab;tab;show:'$';print: (acumAdic rounded ) ; cr.
@@ -682,6 +684,7 @@ registrarIntervencionPaciente
 |rta p fecha inter matricula pac espe|
 
 rta:= true.
+"Evalua si la coleccion paciente, intervencion, o medico no contiene datos. Si es verdadero manda un error."
 (paciente isEmpty or: [intervencion isEmpty or: [medico isEmpty]]) ifTrue: [MessageBox errorMsg: 'BASE DE DATOS VACIA.' caption: 'Error del sistema'] ifFalse: [
 [rta] whileTrue: [
     fecha := (Prompter prompt: 'Ingrese una fecha. (MM/DD/YYYY)' caption:'Menú administrador > Registro > Intervención de paciente').
@@ -734,7 +737,7 @@ rta:= true.
     ] ifFalse: [
 	especialidad := (Prompter prompt: 'Ingrese la especialidad' caption:'Menú administrador > Registro > Médico').
 	disponibilidad := (MessageBox confirm: '¿Está disponible?' caption:'Menú administrador > Registro > Médico').
-	(((self existeEspecialidad: especialidad)=false and:[disponibilidad=false]) or:[((self medicosDisponibles: especialidad y: 2)=false) and:[disponibilidad=false]]) ifTrue: [
+	(((self medicosDisponibles: especialidad y: 2)=false) and:[disponibilidad=false]) ifTrue: [
 	MessageBox warning: 'Debe haber un médico disponible por cada especialidad' caption:'Menú administrador > Registro > Médico'.
 	]
 	ifFalse:[
