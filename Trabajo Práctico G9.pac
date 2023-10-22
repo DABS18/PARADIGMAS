@@ -20,10 +20,10 @@ package globalAliases: (Set new
 	yourself).
 
 package setPrerequisites: #(
-	'..\..\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\Base\Dolphin'
-	'..\..\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\Base\Dolphin Legacy Date & Time'
-	'..\..\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\Base\Dolphin Message Box'
-	'..\..\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\MVP\Presenters\Prompters\Dolphin Prompter').
+	'C:\Users\Fringe\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\Base\Dolphin'
+	'C:\Users\Fringe\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\Base\Dolphin Legacy Date & Time'
+	'C:\Users\Fringe\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\Base\Dolphin Message Box'
+	'C:\Users\Fringe\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\MVP\Presenters\Prompters\Dolphin Prompter').
 
 package!
 
@@ -86,12 +86,12 @@ cargaDatos: unCod y: unaEspecialidad
 
 |temp|
 codigo:=unCod.
-descripcion:=(Prompter prompt: 'Ingrese la descripcion' caption:'Menú administrador > Registro > Intervención').
+descripcion:=(Prompter prompt: 'Ingrese la descripcion'  caption:'Registro > Intervención').
 especialidad:=unaEspecialidad.
-(temp:=(Prompter prompt: 'Ingrese el arancel' caption:'Menú administrador > Registro > Intervención')).
+(temp:=(Prompter prompt: 'Ingrese el arancel' caption: ' Registro > Intervención')).
 [((self esFlotante: temp)=false)] whileTrue: [
-	MessageBox errorMsg: 'Debe ingresar un número'.
-	temp:=(Prompter prompt: 'Ingrese el arancel' caption:'Menú administrador > Registro > Intervención').
+	MessageBox errorMsg: 'Debe ingresar un número' caption: ' Registro > Intervención'.
+	temp:=(Prompter prompt: 'Ingrese el arancel' caption:' Registro > Intervención').
 	((self esFlotante: temp))
 ].
 arancel:=temp asNumber asFloat.
@@ -234,8 +234,8 @@ cargaDatos: unaMatricula y: unaEspecialidad y: unaDisponibilidad
 "Se cargan los datos de un médico, unaMatricula, unaEspecialidad y unaDisponibilidad vienen validadas"
 
 matricula:=unaMatricula.
-nombre:=(Prompter prompt: 'Ingrese el nombre' caption:'Menú administrador > Registro > Médico').
-apellido:=(Prompter prompt: 'Ingrese el apellido' caption:'Menú administrador > Registro > Médico').
+nombre:=(Prompter prompt: 'Ingrese el nombre' caption:'Registro > Médico').
+apellido:=(Prompter prompt: 'Ingrese el apellido' caption: 'Registro > Médico').
 especialidad:=unaEspecialidad.
 condicion:=unaDisponibilidad.!
 
@@ -308,14 +308,14 @@ cargaDatos: unDni
 
 |ob temp|
 dni:=unDni.
-nombre:=(Prompter prompt: 'Ingrese el nombre').
-apellido:=(Prompter prompt: 'Ingrese el apellido').
-ob:=(MessageBox confirm:'¿Usted posee obra social?').
-ob ifTrue: [obraSocial:=(Prompter prompt: 'Ingrese el nombre de su obra social'). 
-(temp:=(Prompter prompt: 'Ingrese el porcentaje de cobertura')).
+nombre:=(Prompter prompt: 'Ingrese el nombre' caption:'Registro > Paciente').
+apellido:=(Prompter prompt: 'Ingrese el apellido' caption: 'Registro > Paciente').
+ob:=(MessageBox confirm:'¿Usted posee obra social?' caption: 'Registro > Paciente').
+ob ifTrue: [obraSocial:=(Prompter prompt: 'Ingrese el nombre de su obra social' caption: 'Registro > Paciente'). 
+(temp:=(Prompter prompt: 'Ingrese el porcentaje de cobertura' caption: 'Registro > Paciente')).
 [((self esFlotante: temp)=false)] whileTrue: [
-	MessageBox errorMsg: 'Debe ingresar un número'.
-	temp:=(Prompter prompt: 'Ingrese el porcentaje de cobertura').
+	MessageBox errorMsg: 'Debe ingresar un número' caption:'Registro > Paciente'.
+	temp:=(Prompter prompt: 'Ingrese el porcentaje de cobertura' caption: 'Registro > Paciente').
 	((self esFlotante: temp))
 ].
 porcCobertura:=temp asNumber asFloat.
@@ -392,7 +392,7 @@ Sanatorio comment: ''!
 
 buscarEnColeccion: unValor y: unaColeccion
 |temp|
-"Recorre una coleccion y detecta el valor ingresado, si lo encuentra devuelve un objeto de esa coleccion."
+
 (unaColeccion = intervencion) ifTrue:[
 	temp:= unaColeccion detect:[:i | i codigo = unValor]  
 ].
@@ -438,7 +438,7 @@ cod:=Prompter prompt: 'Ingrese el código de la intervención' caption:'Consulta
 t:= intervencion detect:[:i | i codigo = cod]
 ifNone:[ MessageBox notify: 'Incorrecto. Vuelva a ingresar el código o escriba SALIR para regresar al menú.'. t:= nil. ((cod='SALIR') ifTrue: [t:='3']) ]].
 
-(t isNil and: [t='SALIR'] ) ifFalse: [t muestra].!
+(t isNil and: [cod='SALIR'] ) ifFalse: [t muestra].!
 
 consultaMedico
 "Se ingresa una matrícula y se busca si existe un objeto con esa matrícula en la colección medico. Si existe, se muestran sus datos."
@@ -450,7 +450,7 @@ mat:=Prompter prompt: 'Ingrese la matrícula del profesional' caption:'Consulta 
 m:= medico detect:[:i | i matricula=mat]
 ifNone:[ MessageBox notify: 'Incorrecto. Vuelva a ingresar legajo o escriba SALIR para regresar al menú.'. m:= nil. ((mat='SALIR') ifTrue: [m:='3']) ]].
 
-(m isNil and: [m='SALIR'] ) ifFalse: [m muestra].
+(m isNil and: [mat='SALIR'] ) ifFalse: [m muestra].
 
  !
 
@@ -464,7 +464,7 @@ pac:=Prompter prompt: 'Ingrese el DNI del paciente' caption:'Consulta > Paciente
 p:= paciente detect:[:i | i dni=pac ]
 ifNone:[ MessageBox notify: 'Incorrecto. Vuelva a ingresar el DNI o escriba SALIR para regresar al menú.'. p:= nil. ((pac='SALIR') ifTrue: [p:='3'])]].
 
-(p isNil and: [p='SALIR'] ) ifFalse: [p muestra].!
+(p isNil and: [pac='SALIR'] ) ifFalse: [p muestra].!
 
 esFechaValida: unaFecha
 "Valida que el argumento unaFecha, que es un String, pueda ser convertido a una fecha correctamente. Valida además que la fecha no sea del pasado."
@@ -488,19 +488,17 @@ estadoliquidacion: unDNI
 	Transcript clear.
 	Transcript show: 'Paciente: ';show: coleccionPaciente nombre;show: ' ';show: coleccionPaciente apellido;show: '  Obra social:  '; show: coleccionPaciente obraSocial; cr.
 	Transcript show:'';show: 'Fecha';tab; show: '      Descripcion         ';show: ' Medico   ';tab; show: '       Mat.   '; show: 'Importe'; cr.
-	"Recorre la coleccion intervencionpaciente filtrada con un DNI y una condicionpago false, invoca el metodo buscarencoleccion que retorna una instancia de la coleccion intervencion y medico respectivamente."
         coleccion2 do: [:i |
 	    tempInt:= (self buscarEnColeccion: (i intervencion) y: intervencion).
 	    tempMed:= (self buscarEnColeccion: (i medico) y: medico).	
             Transcript show: i fecha;show: '    '; show: tempInt descripcion;show: '   ' ;show: tempMed nombre;show:' ';show: tempMed apellido;show: '   '; show: tempMed matricula;show: '   ';show:'  ';show: '$'; print: tempInt arancel; tab; tab;
                 cr.
-	"Evalua si la intervencion es de altacomplejidad, si es le calcula el arancel junto con el porcentaje de alta complejidad."
-	(tempInt isKindOf: AltaComplejidad) ifTrue: [total:= total + ((tempInt arancel)*(1+( AltaComplejidad adicional/100))). acumAdic:= (((tempInt arancel)*(1+( AltaComplejidad adicional/100)))-tempInt arancel) + acumAdic ] ifFalse: [total:= total + (tempInt arancel)]
+	(tempInt isKindOf: AltaComplejidad) ifTrue: [total:= total + ((tempInt arancel) * (1+ (AltaComplejidad adicional / 100))). acumAdic:= (((tempInt arancel) * (1+ (AltaComplejidad adicional / 100)))-tempInt arancel) + acumAdic ] ifFalse: [total:= total + (tempInt arancel)]
         ].
-	Transcript cr; show: 'Carga por Adicional';tab;tab;tab;show:'$';print: (acumAdic rounded ) ; cr.
-	Transcript show: 'Total';tab;tab;tab;tab;show:'$';print: total rounded; cr.
-	Transcript show: 'Cobertura Obra social';tab;tab;show: '$';print: (self calcDescuento: total y: coleccionPaciente porcCobertura) rounded ;cr.
-        Transcript show: 'Neto a pagar       ';tab;tab;tab;show:'$';print: (self netoaPagar: total y: coleccionPaciente porcCobertura) rounded ;cr.
+	Transcript cr; show: 'Carga por Adicional';tab;tab;tab;show:'$';print: acumAdic; cr.
+	Transcript show: 'Total';tab;tab;tab;tab;show:'$';print: total; cr.
+	Transcript show: 'Cobertura Obra social';tab;tab;show: '$';print: (self calcDescuento: total y: coleccionPaciente porcCobertura) ;cr.
+        Transcript show: 'Neto a pagar       ';tab;tab;tab;show:'$';print: (self netoaPagar: total y: coleccionPaciente porcCobertura) ;cr.
 	
 	(total = 0) ifTrue: [^'Este paciente no registra deudas'] ifFalse:[^(Transcript contents) asString].!
 
@@ -684,7 +682,6 @@ registrarIntervencionPaciente
 |rta p fecha inter matricula pac espe|
 
 rta:= true.
-"Evalua si la coleccion paciente, intervencion, o medico no contiene datos. Si es verdadero manda un error."
 (paciente isEmpty or: [intervencion isEmpty or: [medico isEmpty]]) ifTrue: [MessageBox errorMsg: 'BASE DE DATOS VACIA.' caption: 'Error del sistema'] ifFalse: [
 [rta] whileTrue: [
     fecha := (Prompter prompt: 'Ingrese una fecha. (MM/DD/YYYY)' caption:'Menú administrador > Registro > Intervención de paciente').
@@ -692,14 +689,12 @@ rta:= true.
         MessageBox warning: 'Fecha inválida. Vuelva a intentarlo.' caption:'Menú administrador > Registro > Intervención de paciente'.
     ] ifTrue: [
 	pac := (Prompter prompt: 'Ingrese el DNI del paciente' caption:'Menú administrador > Registro > Intervención de paciente').
-	[self existeDNI: pac] whileFalse: [
-	      MessageBox errorMsg: 'El documento ingresado no coincide con nuestros registros. Vuelva a intentarlo.' caption:'Menú administrador > Registro > Intervención de paciente'.
-	      pac := (Prompter prompt: 'Ingrese el DNI del paciente' caption:'Menú administrador > Registro > Intervención de paciente').
+	(self existeDNI: pac) ifFalse: [
+	      pac:= MessageBox errorMsg: 'El documento ingresado no coincide con nuestros registros. Vuelva a intentarlo.' caption:'Menú administrador > Registro > Intervención de paciente'.
 	].
 	espe:= Prompter prompt: 'Ingrese la especialidad.' caption:'Menú administrador > Registro > Intervención de paciente'.
 	[self existeEspecialidad: espe ] whileFalse: [
-		MessageBox errorMsg: 'Los datos ingresados no coinciden con nuestros registros. Vuelva a intentarlo.' caption:'Menú administrador > Registro > Intervención de paciente'.
-		espe:= Prompter prompt: 'Ingrese la especialidad.' caption:'Menú administrador > Registro > Intervención de paciente'.
+		espe:= Prompter prompt: 'Los datos ingresados no coinciden con nuestros registros. Vuelva a intentarlo.' caption:'Menú administrador > Registro > Intervención de paciente'.
 	].
 	MessageBox notify:(self medicosDisponibles: espe y: 1).
 	matricula:= Prompter prompt: 'Ingrese la matrícula del profesional' caption:'Menú administrador > Registro > Intervención de paciente'.
@@ -839,10 +834,10 @@ cargaAdicional
 "Permite ingresar el adicional de las Intervenciones de alta complejidad"
 
 |temp|
-(temp:=(Prompter prompt: 'Ingrese el adicional' caption: 'Intervenciones > Alta Complejidad')).
+(temp:=(Prompter prompt: 'Ingrese el adicional' caption:'Intervenciones > Alta complejidad')).
 [((super esFlotante: temp)=false)] whileTrue: [
-	MessageBox errorMsg: 'Debe ingresar un número'.
-	temp:=(Prompter prompt: 'Ingrese el adicional' caption: 'Intervenciones > Alta Complejidad').
+	MessageBox errorMsg: 'Debe ingresar un número' caption:'Intervenciones > Alta complejidad'.
+	temp:=(Prompter prompt: 'Ingrese el adicional' caption:'Intervenciones > Alta complejidad').
 	((super esFlotante: temp)).
 ].
 Adicional:=temp asNumber asFloat.!
