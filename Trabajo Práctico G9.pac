@@ -433,24 +433,31 @@ consultaIntervencion
 
 |cod t|
 
-[t isNil] whileTrue:[
-cod:=Prompter prompt: 'Ingrese el código de la intervención' caption:'Consulta > Intervención'.
-t:= intervencion detect:[:i | i codigo = cod]
-ifNone:[ MessageBox notify: 'Incorrecto. Vuelva a ingresar el código o escriba SALIR para regresar al menú.'. t:= nil. ((cod='SALIR') ifTrue: [t:='3']) ]].
+[t isNil] whileTrue:
+[
+    cod:=Prompter prompt: 'Ingrese el código de la intervención' caption:'Consulta > Intervención'.
+    (cod='0') ifTrue: [self menu].
+    t:= intervencion detect:[:i | i codigo=cod ]
+    ifNone:[ MessageBox warning: 'Incorrecto. Vuelva a ingresar el código.'. t:= nil.]
+].
 
-(t isNil and: [cod='SALIR'] ) ifFalse: [t muestra].!
+t muestra
+!
 
 consultaMedico
 "Se ingresa una matrícula y se busca si existe un objeto con esa matrícula en la colección medico. Si existe, se muestran sus datos."
 
 |mat m|
 
-[m isNil] whileTrue:[
-mat:=Prompter prompt: 'Ingrese la matrícula del profesional' caption:'Consulta > Médico'.
-m:= medico detect:[:i | i matricula=mat]
-ifNone:[ MessageBox notify: 'Incorrecto. Vuelva a ingresar legajo o escriba SALIR para regresar al menú.'. m:= nil. ((mat='SALIR') ifTrue: [m:='3']) ]].
+[m isNil] whileTrue:
+[
+    mat:=Prompter prompt: 'Ingrese la matrícula del médico' caption:'Consulta > Médico'.
+    (mat='0') ifTrue: [self menu].
+    m:= medico detect:[:i | i matricula=mat ]
+    ifNone:[ MessageBox warning: 'Incorrecto. Vuelva a ingresar la matrícula.'. m:= nil.]
+].
 
-(m isNil and: [mat='SALIR'] ) ifFalse: [m muestra].
+m muestra
 
  !
 
@@ -459,12 +466,15 @@ consultaPaciente
 
 |pac p|
 
-[p isNil] whileTrue:[
-pac:=Prompter prompt: 'Ingrese el DNI del paciente' caption:'Consulta > Paciente'.
-p:= paciente detect:[:i | i dni=pac ]
-ifNone:[ MessageBox notify: 'Incorrecto. Vuelva a ingresar el DNI o escriba SALIR para regresar al menú.'. p:= nil. ((pac='SALIR') ifTrue: [p:='3'])]].
+[p isNil] whileTrue:
+[
+    pac:=Prompter prompt: 'Ingrese el DNI del paciente' caption:'Consulta > Paciente'.
+    (pac='0') ifTrue: [self menu].
+    p:= paciente detect:[:i | i dni=pac ]
+    ifNone:[ MessageBox warning: 'Incorrecto. Vuelva a ingresar el DNI.'. p:= nil.]
+].
 
-(p isNil and: [pac='SALIR'] ) ifFalse: [p muestra].!
+p muestra!
 
 esFechaValida: unaFecha
 "Valida que el argumento unaFecha, que es un String, pueda ser convertido a una fecha correctamente. Valida además que la fecha no sea del pasado."
@@ -495,10 +505,10 @@ estadoliquidacion: unDNI
                 cr.
 	(tempInt isKindOf: AltaComplejidad) ifTrue: [total:= total + ((tempInt arancel) * (1+ (AltaComplejidad adicional / 100))). acumAdic:= (((tempInt arancel) * (1+ (AltaComplejidad adicional / 100)))-tempInt arancel) + acumAdic ] ifFalse: [total:= total + (tempInt arancel)]
         ].
-	Transcript cr; show: 'Carga por Adicional';tab;tab;tab;show:'$';print: acumAdic; cr.
-	Transcript show: 'Total';tab;tab;tab;tab;show:'$';print: total; cr.
-	Transcript show: 'Cobertura Obra social';tab;tab;show: '$';print: (self calcDescuento: total y: coleccionPaciente porcCobertura) ;cr.
-        Transcript show: 'Neto a pagar       ';tab;tab;tab;show:'$';print: (self netoaPagar: total y: coleccionPaciente porcCobertura) ;cr.
+	Transcript cr; show: 'Carga por Adicional';tab;tab;tab;show:'$';print: acumAdic rounded; cr.
+	Transcript show: 'Total';tab;tab;tab;tab;show:'$';print: total rounded; cr.
+	Transcript show: 'Cobertura Obra social';tab;tab;show: '$';print: (self calcDescuento: total y: coleccionPaciente porcCobertura) rounded ;cr.
+        Transcript show: 'Neto a pagar       ';tab;tab;tab;show:'$';print: (self netoaPagar: total y: coleccionPaciente porcCobertura) rounded;cr.
 	
 	(total = 0) ifTrue: [^'Este paciente no registra deudas'] ifFalse:[^(Transcript contents) asString].!
 
@@ -539,8 +549,7 @@ inicio
 	medico := OrderedCollection new.
 	intervencion := OrderedCollection new.
 	intervencionPaciente:= OrderedCollection new.
-
-self menu.!
+!
 
 intervencionesDisponibles: unaEspecialidad
 "Lista de intervenciones disponibles teniendo en cuenta la especialidad seleccionada."
@@ -569,6 +578,8 @@ liquidacion
 
 |coleccion2 rta dni|
 
+
+(paciente isEmpty or: [intervencion isEmpty or: [medico isEmpty]]) ifTrue: [MessageBox errorMsg: 'BASE DE DATOS VACIA.' caption: 'Error del sistema'] ifFalse: [
 rta:=1.
 dni:=(Prompter prompt: 'Ingrese el DNI del paciente con intervenciones registradas').
 [rta = 1] whileTrue:[
@@ -581,6 +592,8 @@ dni:=(Prompter prompt: 'Ingrese el DNI del paciente con intervenciones registrad
 	dni:=(Prompter prompt: 'Ingrese otro DNI o 0 para salir').
 	(dni = '0') ifTrue:[ rta:=0].
 ].
+
+]
 !
 
 medicosDisponibles: unaEspecialidad y: unaOpcion
@@ -689,26 +702,37 @@ rta:= true.
         MessageBox warning: 'Fecha inválida. Vuelva a intentarlo.' caption:'Menú administrador > Registro > Intervención de paciente'.
     ] ifTrue: [
 	pac := (Prompter prompt: 'Ingrese el DNI del paciente' caption:'Menú administrador > Registro > Intervención de paciente').
-	(self existeDNI: pac) ifFalse: [
+	(pac='0') ifTrue:[self menu].
+	[self existeDNI: pac] whileFalse: [
 	      pac:= MessageBox errorMsg: 'El documento ingresado no coincide con nuestros registros. Vuelva a intentarlo.' caption:'Menú administrador > Registro > Intervención de paciente'.
+		pac := (Prompter prompt: 'Ingrese el DNI del paciente' caption:'Menú administrador > Registro > Intervención de paciente').
+		(pac='0') ifTrue:[self menu].
+	       self existeDNI: pac.
 	].
 	espe:= Prompter prompt: 'Ingrese la especialidad.' caption:'Menú administrador > Registro > Intervención de paciente'.
+	(espe='0') ifTrue:[self menu].
 	[self existeEspecialidad: espe ] whileFalse: [
-		espe:= Prompter prompt: 'Los datos ingresados no coinciden con nuestros registros. Vuelva a intentarlo.' caption:'Menú administrador > Registro > Intervención de paciente'.
+		MessageBox warning: 'Los datos ingresados no coinciden con nuestros registros. Vuelva a intentarlo.' caption:'Menú administrador > Registro > Intervención de paciente'.
+		espe:= Prompter prompt:'Ingrese la especialidad.' caption:'Menú administrador > Registro > Intervención de paciente'.
+		(espe='0') ifTrue:[self menu].
 	].
 	MessageBox notify:(self medicosDisponibles: espe y: 1).
 	matricula:= Prompter prompt: 'Ingrese la matrícula del profesional' caption:'Menú administrador > Registro > Intervención de paciente'.
+	(matricula='0') ifTrue:[self menu].
 	[self validarMedico: matricula y: espe] whileFalse: [
 		MessageBox warning:('La matrícula ingresada no coincide con nuestros registros. Vuelva a intentarlo.') caption:'Menú administrador > Registro > Intervención de paciente'.
 		MessageBox notify:(self medicosDisponibles: espe y: 1).
 		matricula:= Prompter prompt: 'Ingrese la matrícula del profesional.' caption:'Menú administrador > Registro > Intervención de paciente'.
+		(matricula='0') ifTrue:[self menu].
 	].
 	MessageBox notify:(self intervencionesDisponibles: espe).
 	inter:= Prompter prompt: 'Ingrese el código de intervención' caption:'Menú administrador > Registro > Intervención de paciente'.
+	(inter='0') ifTrue:[self menu].
 	[self validarIntervencion: inter y: espe] whileFalse: [
 		MessageBox warning:('El código de intervención ingresado no coincide con nuestros registros. Vuelva a intentarlo.') caption:'Menú administrador > Registro > Intervención de paciente'.
 		MessageBox notify:(self intervencionesDisponibles: espe).
 		espe:= Prompter prompt: 'Ingrese el código de intervención' caption:'Menú administrador > Registro > Intervención de paciente'.
+		(inter='0') ifTrue:[self menu].
 	].
 	
         p:= IntervencionRegistrada new.
