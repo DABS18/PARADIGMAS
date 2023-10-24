@@ -433,48 +433,49 @@ consultaIntervencion
 
 |cod t|
 
-[t isNil] whileTrue:
+[t isNil and: [(cod = '0') not]] whileTrue:
 [
     cod:=Prompter prompt: 'Ingrese el código de la intervención' caption:'Consulta > Intervención'.
-    (cod='0') ifTrue: [self menu].
-    t:= intervencion detect:[:i | i codigo=cod ]
-    ifNone:[ MessageBox warning: 'Incorrecto. Vuelva a ingresar el código.'. t:= nil.]
+    (cod='0') ifTrue: [self consulta] ifFalse: [
+        t:= intervencion detect:[:i | i codigo=cod]
+        ifNone:[ MessageBox warning: 'Incorrecto. Vuelva a ingresar el código.'. t:= nil.]
+    ].
 ].
 
-t muestra
-!
+(t isNil) ifFalse: [t muestra ]!
 
 consultaMedico
 "Se ingresa una matrícula y se busca si existe un objeto con esa matrícula en la colección medico. Si existe, se muestran sus datos."
 
 |mat m|
 
-[m isNil] whileTrue:
+[m isNil and: [(mat = '0') not]] whileTrue:
 [
     mat:=Prompter prompt: 'Ingrese la matrícula del médico' caption:'Consulta > Médico'.
-    (mat='0') ifTrue: [self menu].
-    m:= medico detect:[:i | i matricula=mat ]
-    ifNone:[ MessageBox warning: 'Incorrecto. Vuelva a ingresar la matrícula.'. m:= nil.]
+    (mat='0') ifTrue: [self consulta] ifFalse: [
+        m:= medico detect:[:i | i matricula=mat ]
+        ifNone:[ MessageBox warning: 'Incorrecto. Vuelva a ingresar la matrícula.'. m:= nil.]
+    ].
 ].
 
-m muestra
-
- !
+m isNil ifFalse: [ m muestra ]
+!
 
 consultaPaciente
 "Se ingresa un DNI y se lo busca en la colección paciente. Si existe, se muestran sus datos."
 
 |pac p|
 
-[p isNil] whileTrue:
+[p isNil and: [(pac = '0') not]] whileTrue:
 [
     pac:=Prompter prompt: 'Ingrese el DNI del paciente' caption:'Consulta > Paciente'.
-    (pac='0') ifTrue: [self menu].
-    p:= paciente detect:[:i | i dni=pac ]
-    ifNone:[ MessageBox warning: 'Incorrecto. Vuelva a ingresar el DNI.'. p:= nil.]
+    (pac='0') ifTrue: [self consulta] ifFalse: [
+        p:= paciente detect:[:i | i dni=pac ]
+        ifNone:[ MessageBox warning: 'Incorrecto. Vuelva a ingresar el DNI.'. p:= nil.]
+    ].
 ].
 
-p muestra!
+p isNil ifFalse: [ p muestra ]!
 
 esFechaValida: unaFecha
 "Valida que el argumento unaFecha, que es un String, pueda ser convertido a una fecha correctamente. Valida además que la fecha no sea del pasado."
