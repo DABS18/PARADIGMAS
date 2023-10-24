@@ -702,38 +702,30 @@ rta:= true.
         MessageBox warning: 'Fecha inválida. Vuelva a intentarlo.' caption:'Menú administrador > Registro > Intervención de paciente'.
     ] ifTrue: [
 	pac := (Prompter prompt: 'Ingrese el DNI del paciente' caption:'Menú administrador > Registro > Intervención de paciente').
-	(pac='0') ifTrue:[self menu].
 	[self existeDNI: pac] whileFalse: [
 	      pac:= MessageBox errorMsg: 'El documento ingresado no coincide con nuestros registros. Vuelva a intentarlo.' caption:'Menú administrador > Registro > Intervención de paciente'.
 		pac := (Prompter prompt: 'Ingrese el DNI del paciente' caption:'Menú administrador > Registro > Intervención de paciente').
-		(pac='0') ifTrue:[self menu].
 	       self existeDNI: pac.
 	].
 	espe:= Prompter prompt: 'Ingrese la especialidad.' caption:'Menú administrador > Registro > Intervención de paciente'.
-	(espe='0') ifTrue:[self menu].
 	[self existeEspecialidad: espe ] whileFalse: [
 		MessageBox warning: ('Los datos ingresados no coinciden con nuestros registros. Vuelva a intentarlo.') caption:'Menú administrador > Registro > Intervención de paciente'.
 		espe:= Prompter prompt:'Ingrese la especialidad.' caption:'Menú administrador > Registro > Intervención de paciente'.
-		(espe='0') ifTrue:[self menu].
 		self existeEspecialidad: espe.
 	].
 	MessageBox notify:(self medicosDisponibles: espe y: 1).
 	matricula:= Prompter prompt: 'Ingrese la matrícula del profesional' caption:'Menú administrador > Registro > Intervención de paciente'.
-	(matricula='0') ifTrue:[self menu].
 	[self validarMedico: matricula y: espe] whileFalse: [
 		MessageBox warning:('La matrícula ingresada no coincide con nuestros registros. Vuelva a intentarlo.') caption:'Menú administrador > Registro > Intervención de paciente'.
 		MessageBox notify:(self medicosDisponibles: espe y: 1).
 		matricula:= Prompter prompt: 'Ingrese la matrícula del profesional.' caption:'Menú administrador > Registro > Intervención de paciente'.
-		(matricula='0') ifTrue:[self menu].
 	].
 	MessageBox notify:(self intervencionesDisponibles: espe).
 	inter:= Prompter prompt: 'Ingrese el código de intervención' caption:'Menú administrador > Registro > Intervención de paciente'.
-	(inter='0') ifTrue:[self menu].
 	[self validarIntervencion: inter y: espe] whileFalse: [
 		MessageBox warning:('El código de intervención ingresado no coincide con nuestros registros. Vuelva a intentarlo.') caption:'Menú administrador > Registro > Intervención de paciente'.
 		MessageBox notify:(self intervencionesDisponibles: espe).
 		inter:= Prompter prompt: 'Ingrese el código de intervención' caption:'Menú administrador > Registro > Intervención de paciente'.
-		(inter='0') ifTrue:[self menu].
 	].
 	
         p:= IntervencionRegistrada new.
