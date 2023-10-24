@@ -712,9 +712,10 @@ rta:= true.
 	espe:= Prompter prompt: 'Ingrese la especialidad.' caption:'Menú administrador > Registro > Intervención de paciente'.
 	(espe='0') ifTrue:[self menu].
 	[self existeEspecialidad: espe ] whileFalse: [
-		MessageBox warning: 'Los datos ingresados no coinciden con nuestros registros. Vuelva a intentarlo.' caption:'Menú administrador > Registro > Intervención de paciente'.
+		MessageBox warning: ('Los datos ingresados no coinciden con nuestros registros. Vuelva a intentarlo.') caption:'Menú administrador > Registro > Intervención de paciente'.
 		espe:= Prompter prompt:'Ingrese la especialidad.' caption:'Menú administrador > Registro > Intervención de paciente'.
 		(espe='0') ifTrue:[self menu].
+		self existeEspecialidad: espe.
 	].
 	MessageBox notify:(self medicosDisponibles: espe y: 1).
 	matricula:= Prompter prompt: 'Ingrese la matrícula del profesional' caption:'Menú administrador > Registro > Intervención de paciente'.
@@ -731,7 +732,7 @@ rta:= true.
 	[self validarIntervencion: inter y: espe] whileFalse: [
 		MessageBox warning:('El código de intervención ingresado no coincide con nuestros registros. Vuelva a intentarlo.') caption:'Menú administrador > Registro > Intervención de paciente'.
 		MessageBox notify:(self intervencionesDisponibles: espe).
-		espe:= Prompter prompt: 'Ingrese el código de intervención' caption:'Menú administrador > Registro > Intervención de paciente'.
+		inter:= Prompter prompt: 'Ingrese el código de intervención' caption:'Menú administrador > Registro > Intervención de paciente'.
 		(inter='0') ifTrue:[self menu].
 	].
 	
