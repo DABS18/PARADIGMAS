@@ -35,7 +35,7 @@ Object subclass: #Intervencion
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
 Object subclass: #IntervencionRegistrada
-	instanceVariableNames: 'fecha medico paciente intervencion condicionPago'
+	instanceVariableNames: 'fecha datosMedico datosPaciente datosIntervencion condicionPago'
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
@@ -86,12 +86,12 @@ cargaDatos: unCod y: unaEspecialidad
 
 |temp|
 codigo:=unCod.
-descripcion:=(Prompter prompt: 'Ingrese la descripcion' caption:'Menú administrador > Registro > Intervención').
+descripcion:=(Prompter prompt: 'Ingrese la descripcion'  caption:'Registro > Intervención').
 especialidad:=unaEspecialidad.
-(temp:=(Prompter prompt: 'Ingrese el arancel' caption:'Menú administrador > Registro > Intervención')).
+(temp:=(Prompter prompt: 'Ingrese el arancel' caption: ' Registro > Intervención')).
 [((self esFlotante: temp)=false)] whileTrue: [
-	MessageBox errorMsg: 'Debe ingresar un número'.
-	temp:=(Prompter prompt: 'Ingrese el arancel' caption:'Menú administrador > Registro > Intervención').
+	MessageBox errorMsg: 'Debe ingresar un número' caption: ' Registro > Intervención'.
+	temp:=(Prompter prompt: 'Ingrese el arancel' caption:' Registro > Intervención').
 	((self esFlotante: temp))
 ].
 arancel:=temp asNumber asFloat.
@@ -171,9 +171,9 @@ cargaDatos: unaFecha y: unPaciente y: unMedico y:unaIntervencion y:unaCondicion
 "Se permite la carga de datos para la intervención del paciente, todos los datos son validados"
 
 fecha:=unaFecha.
-paciente:=unPaciente.
-medico:=unMedico.
-intervencion:=unaIntervencion.
+datosPaciente :=unPaciente.
+datosMedico:=unMedico.
+datosIntervencion:=unaIntervencion.
 condicionPago:= unaCondicion.!
 
 condicionPago
@@ -181,26 +181,25 @@ condicionPago
 
 ^condicionPago!
 
+datosIntervencion
+"getter"
+
+^datosIntervencion!
+
+datosMedico
+"getter"
+
+^datosMedico!
+
+datosPaciente
+"getter"
+
+^datosPaciente!
+
 fecha
 "getter"
 
 ^fecha!
-
-intervencion
-"getter"
-
-^intervencion!
-
-medico
-"getter"
-
-^medico!
-
-paciente
-"getter"
-
-^paciente
-!
 
 precargaDatos: unaFecha y: unPaciente y: unMedico y: unaIntervencion y: unaCondicion
 "Utilizado para pruebas internas. Desestimar"
@@ -213,10 +212,10 @@ condicionPago:= unaCondicion.! !
 !IntervencionRegistrada categoriesForMethods!
 cargaDatos:y:y:y:y:!public! !
 condicionPago!public! !
+datosIntervencion!public! !
+datosMedico!public! !
+datosPaciente!public! !
 fecha!public! !
-intervencion!public! !
-medico!public! !
-paciente!public! !
 precargaDatos:y:y:y:y:!public! !
 !
 
@@ -234,8 +233,8 @@ cargaDatos: unaMatricula y: unaEspecialidad y: unaDisponibilidad
 "Se cargan los datos de un médico, unaMatricula, unaEspecialidad y unaDisponibilidad vienen validadas"
 
 matricula:=unaMatricula.
-nombre:=(Prompter prompt: 'Ingrese el nombre' caption:'Menú administrador > Registro > Médico').
-apellido:=(Prompter prompt: 'Ingrese el apellido' caption:'Menú administrador > Registro > Médico').
+nombre:=(Prompter prompt: 'Ingrese el nombre' caption:'Registro > Médico').
+apellido:=(Prompter prompt: 'Ingrese el apellido' caption: 'Registro > Médico').
 especialidad:=unaEspecialidad.
 condicion:=unaDisponibilidad.!
 
@@ -308,14 +307,14 @@ cargaDatos: unDni
 
 |ob temp|
 dni:=unDni.
-nombre:=(Prompter prompt: 'Ingrese el nombre').
-apellido:=(Prompter prompt: 'Ingrese el apellido').
-ob:=(MessageBox confirm:'¿Usted posee obra social?').
-ob ifTrue: [obraSocial:=(Prompter prompt: 'Ingrese el nombre de su obra social'). 
-(temp:=(Prompter prompt: 'Ingrese el porcentaje de cobertura')).
+nombre:=(Prompter prompt: 'Ingrese el nombre' caption:'Registro > Paciente').
+apellido:=(Prompter prompt: 'Ingrese el apellido' caption: 'Registro > Paciente').
+ob:=(MessageBox confirm:'¿Usted posee obra social?' caption: 'Registro > Paciente').
+ob ifTrue: [obraSocial:=(Prompter prompt: 'Ingrese el nombre de su obra social' caption: 'Registro > Paciente'). 
+(temp:=(Prompter prompt: 'Ingrese el porcentaje de cobertura' caption: 'Registro > Paciente')).
 [((self esFlotante: temp)=false)] whileTrue: [
-	MessageBox errorMsg: 'Debe ingresar un número'.
-	temp:=(Prompter prompt: 'Ingrese el porcentaje de cobertura').
+	MessageBox errorMsg: 'Debe ingresar un número' caption:'Registro > Paciente'.
+	temp:=(Prompter prompt: 'Ingrese el porcentaje de cobertura' caption: 'Registro > Paciente').
 	((self esFlotante: temp))
 ].
 porcCobertura:=temp asNumber asFloat.
@@ -390,20 +389,6 @@ Sanatorio comment: ''!
 !Sanatorio categoriesForClass!Kernel-Objects! !
 !Sanatorio methodsFor!
 
-buscarEnColeccion: unValor y: unaColeccion
-|temp|
-"Recorre una coleccion y detecta el valor ingresado, si lo encuentra devuelve un objeto de esa coleccion."
-(unaColeccion = intervencion) ifTrue:[
-	temp:= unaColeccion detect:[:i | i codigo = unValor]  
-].
-(unaColeccion = medico) ifTrue: [
-	temp:= unaColeccion detect:[:i | i matricula = unValor]  
-].
-(unaColeccion = paciente) ifTrue: [
-	temp:= unaColeccion detect:[:i | i dni = unValor]  
-].
-^temp!
-
 calcDescuento: unTotal y: unPorcentaje
 
 "Calcula el descuento usado para la liquidación teniendo en cuenta los parámetros utilzados"
@@ -433,38 +418,49 @@ consultaIntervencion
 
 |cod t|
 
-[t isNil] whileTrue:[
-cod:=Prompter prompt: 'Ingrese el código de la intervención' caption:'Consulta > Intervención'.
-t:= intervencion detect:[:i | i codigo = cod]
-ifNone:[ MessageBox notify: 'Incorrecto. Vuelva a ingresar el código o escriba SALIR para regresar al menú.'. t:= nil. ((cod='SALIR') ifTrue: [t:='3']) ]].
+[t isNil and: [(cod = '0') not]] whileTrue:
+[
+    cod:=Prompter prompt: 'Ingrese el código de la intervención' caption:'Consulta > Intervención'.
+    (cod='0') ifTrue: [self consulta] ifFalse: [
+        t:= intervencion detect:[:i | i codigo=cod]
+        ifNone:[ MessageBox warning: 'Incorrecto. Vuelva a ingresar el código.'. t:= nil.]
+    ].
+].
 
-(t isNil and: [t='SALIR'] ) ifFalse: [t muestra].!
+(t isNil) ifFalse: [t muestra ]!
 
 consultaMedico
 "Se ingresa una matrícula y se busca si existe un objeto con esa matrícula en la colección medico. Si existe, se muestran sus datos."
 
 |mat m|
 
-[m isNil] whileTrue:[
-mat:=Prompter prompt: 'Ingrese la matrícula del profesional' caption:'Consulta > Médico'.
-m:= medico detect:[:i | i matricula=mat]
-ifNone:[ MessageBox notify: 'Incorrecto. Vuelva a ingresar legajo o escriba SALIR para regresar al menú.'. m:= nil. ((mat='SALIR') ifTrue: [m:='3']) ]].
+[m isNil and: [(mat = '0') not]] whileTrue:
+[
+    mat:=Prompter prompt: 'Ingrese la matrícula del médico' caption:'Consulta > Médico'.
+    (mat='0') ifTrue: [self consulta] ifFalse: [
+        m:= medico detect:[:i | i matricula=mat ]
+        ifNone:[ MessageBox warning: 'Incorrecto. Vuelva a ingresar la matrícula.'. m:= nil.]
+    ].
+].
 
-(m isNil and: [m='SALIR'] ) ifFalse: [m muestra].
-
- !
+m isNil ifFalse: [ m muestra ]
+!
 
 consultaPaciente
 "Se ingresa un DNI y se lo busca en la colección paciente. Si existe, se muestran sus datos."
 
 |pac p|
 
-[p isNil] whileTrue:[
-pac:=Prompter prompt: 'Ingrese el DNI del paciente' caption:'Consulta > Paciente'.
-p:= paciente detect:[:i | i dni=pac ]
-ifNone:[ MessageBox notify: 'Incorrecto. Vuelva a ingresar el DNI o escriba SALIR para regresar al menú.'. p:= nil. ((pac='SALIR') ifTrue: [p:='3'])]].
+[p isNil and: [(pac = '0') not]] whileTrue:
+[
+    pac:=Prompter prompt: 'Ingrese el DNI del paciente' caption:'Consulta > Paciente'.
+    (pac='0') ifTrue: [self consulta] ifFalse: [
+        p:= paciente detect:[:i | i dni=pac ]
+        ifNone:[ MessageBox warning: 'Incorrecto. Vuelva a ingresar el DNI.'. p:= nil.]
+    ].
+].
 
-(p isNil and: [p='SALIR'] ) ifFalse: [p muestra].!
+p isNil ifFalse: [ p muestra ]!
 
 esFechaValida: unaFecha
 "Valida que el argumento unaFecha, que es un String, pueda ser convertido a una fecha correctamente. Valida además que la fecha no sea del pasado."
@@ -480,27 +476,24 @@ esFechaValida: unaFecha
 estadoliquidacion: unDNI
 "Recibe como parámetro unDNI y primero valida que exista el paciente. Si existe busca en la colección IntervenciónPaciente los datos pertenecientes a ese paciente con sus intervenciones que no estén pagadas. Si el paciente no registra deudas, se emite el mensaje correspondiente."
 
-	|coleccionPaciente coleccion2 tempInt tempMed acumAdic total|
+	| coleccion2 acumAdic total pac|
 	total:= 0.
 	acumAdic:=0.
-	coleccionPaciente:= (self buscarEnColeccion: unDNI y: paciente).	
-	coleccion2 := intervencionPaciente select:[:each | each paciente = unDNI and:[each condicionPago = false]].
+	pac:= (self existeDNI:unDNI).
+	coleccion2 := intervencionPaciente select:[:each | each datosPaciente dni = unDNI and:[each condicionPago = false]].
 	Transcript clear.
-	Transcript show: 'Paciente: ';show: coleccionPaciente nombre;show: ' ';show: coleccionPaciente apellido;show: '  Obra social:  '; show: coleccionPaciente obraSocial; cr.
+	Transcript show: 'Paciente: ';show: pac nombre;show: ' ';show: pac apellido;show: '  Obra social:  '; show: pac obraSocial; cr.
 	Transcript show:'';show: 'Fecha';tab; show: '      Descripcion         ';show: ' Medico   ';tab; show: '       Mat.   '; show: 'Importe'; cr.
-	"Recorre la coleccion intervencionpaciente filtrada con un DNI y una condicionpago false, invoca el metodo buscarencoleccion que retorna una instancia de la coleccion intervencion y medico respectivamente."
-        coleccion2 do: [:i |
-	    tempInt:= (self buscarEnColeccion: (i intervencion) y: intervencion).
-	    tempMed:= (self buscarEnColeccion: (i medico) y: medico).	
-            Transcript show: i fecha;show: '    '; show: tempInt descripcion;show: '   ' ;show: tempMed nombre;show:' ';show: tempMed apellido;show: '   '; show: tempMed matricula;show: '   ';show:'  ';show: '$'; print: tempInt arancel; tab; tab;
+        coleccion2 do: [:each |	
+            Transcript show: each fecha;show: '    '; show: each datosIntervencion descripcion;show: '   ' ;show: each datosMedico nombre;show:' ';show: each datosMedico apellido;show: '   '; show: each datosMedico matricula;show: '   ';show:'  ';show: '$'; print: each datosIntervencion arancel; tab; tab;
                 cr.
-	"Evalua si la intervencion es de altacomplejidad, si es le calcula el arancel junto con el porcentaje de alta complejidad."
-	(tempInt isKindOf: AltaComplejidad) ifTrue: [total:= total + ((tempInt arancel)*(1+( AltaComplejidad adicional/100))). acumAdic:= (((tempInt arancel)*(1+( AltaComplejidad adicional/100)))-tempInt arancel) + acumAdic ] ifFalse: [total:= total + (tempInt arancel)]
+	((each datosIntervencion) isKindOf: AltaComplejidad) ifTrue: [total:= total + ((each datosIntervencion arancel) * (1+ (AltaComplejidad adicional / 100))). acumAdic:= (((each datosIntervencion arancel) * (1+ (AltaComplejidad adicional / 100)))- each datosIntervencion arancel) + acumAdic ] ifFalse: [total:= total + (each datosIntervencion arancel)]
         ].
-	Transcript cr; show: 'Carga por Adicional';tab;tab;tab;show:'$';print: (acumAdic rounded ) ; cr.
+	Transcript cr; show: 'Carga por Adicional';tab;tab;tab;show:'$';print: acumAdic rounded; cr.
 	Transcript show: 'Total';tab;tab;tab;tab;show:'$';print: total rounded; cr.
-	Transcript show: 'Cobertura Obra social';tab;tab;show: '$';print: (self calcDescuento: total y: coleccionPaciente porcCobertura) rounded ;cr.
-        Transcript show: 'Neto a pagar       ';tab;tab;tab;show:'$';print: (self netoaPagar: total y: coleccionPaciente porcCobertura) rounded ;cr.
+
+	Transcript show: 'Cobertura Obra social';tab;tab;show: '$';print: (self calcDescuento: total y: pac porcCobertura) rounded ;cr.
+        Transcript show: 'Neto a pagar       ';tab;tab;tab;show:'$';print: (self netoaPagar: total y: pac porcCobertura) rounded;cr.
 	
 	(total = 0) ifTrue: [^'Este paciente no registra deudas'] ifFalse:[^(Transcript contents) asString].!
 
@@ -515,10 +508,9 @@ i:= intervencion detect:[:each | each codigo=int] ifNone:[i:= 'no'.].
 
 existeDNI: unDNI
 "Valida que exista el código de DNI"
-| p pac|
-pac:= unDNI.
-p:= paciente detect:[:i | i dni=pac] ifNone:[p:= 'no'.].
-(p='no') ifTrue: [^false] ifFalse: [^true ]
+| pac|
+pac:= paciente detect:[:i | i dni=unDNI] ifNone:[pac:= 'none'.].
+(pac='none') ifTrue: [^false] ifFalse: [^pac ]
 !
 
 existeEspecialidad: unaEspecialidad
@@ -541,8 +533,7 @@ inicio
 	medico := OrderedCollection new.
 	intervencion := OrderedCollection new.
 	intervencionPaciente:= OrderedCollection new.
-
-self menu.!
+!
 
 intervencionesDisponibles: unaEspecialidad
 "Lista de intervenciones disponibles teniendo en cuenta la especialidad seleccionada."
@@ -571,10 +562,12 @@ liquidacion
 
 |coleccion2 rta dni|
 
+
+(paciente isEmpty or: [intervencion isEmpty or: [medico isEmpty]]) ifTrue: [MessageBox errorMsg: 'BASE DE DATOS VACIA.' caption: 'Error del sistema'] ifFalse: [
 rta:=1.
 dni:=(Prompter prompt: 'Ingrese el DNI del paciente con intervenciones registradas').
 [rta = 1] whileTrue:[
-	coleccion2 := intervencionPaciente select: [:each | each paciente = dni].
+	coleccion2 := intervencionPaciente select: [:each | (each datosPaciente dni) = dni and:[each condicionPago = false]].
 	(coleccion2 isEmpty) ifTrue: [
 	(MessageBox warning: 'No existe una intervencion pendiente de pago registrado con ese DNI. Intente nuevamente').
 ] ifFalse: [
@@ -583,6 +576,8 @@ dni:=(Prompter prompt: 'Ingrese el DNI del paciente con intervenciones registrad
 	dni:=(Prompter prompt: 'Ingrese otro DNI o 0 para salir').
 	(dni = '0') ifTrue:[ rta:=0].
 ].
+
+]
 !
 
 medicosDisponibles: unaEspecialidad y: unaOpcion
@@ -681,43 +676,46 @@ rta:= true.
 registrarIntervencionPaciente
 "Se registra una intervención de paciente, validando todos los datos correspondientes."
 
-|rta p fecha inter matricula pac espe|
+|rta p fecha inter matricula pac espe temp|
 
 rta:= true.
-"Evalua si la coleccion paciente, intervencion, o medico no contiene datos. Si es verdadero manda un error."
 (paciente isEmpty or: [intervencion isEmpty or: [medico isEmpty]]) ifTrue: [MessageBox errorMsg: 'BASE DE DATOS VACIA.' caption: 'Error del sistema'] ifFalse: [
 [rta] whileTrue: [
     fecha := (Prompter prompt: 'Ingrese una fecha. (MM/DD/YYYY)' caption:'Menú administrador > Registro > Intervención de paciente').
     (self esFechaValida: fecha) ifFalse: [
         MessageBox warning: 'Fecha inválida. Vuelva a intentarlo.' caption:'Menú administrador > Registro > Intervención de paciente'.
     ] ifTrue: [
-	pac := (Prompter prompt: 'Ingrese el DNI del paciente' caption:'Menú administrador > Registro > Intervención de paciente').
-	[self existeDNI: pac] whileFalse: [
-	      MessageBox errorMsg: 'El documento ingresado no coincide con nuestros registros. Vuelva a intentarlo.' caption:'Menú administrador > Registro > Intervención de paciente'.
-	      pac := (Prompter prompt: 'Ingrese el DNI del paciente' caption:'Menú administrador > Registro > Intervención de paciente').
-	].
+	pac:= (Prompter prompt: 'Ingrese el DNI del paciente' caption:'Menú administrador > Registro > Intervención de paciente').
+	[(self existeDNI: pac) ~= false] whileFalse: [
+	      pac:= MessageBox errorMsg: 'El documento ingresado no coincide con nuestros registros. Vuelva a intentarlo.' caption:'Menú administrador > Registro > Intervención de paciente'.
+	      pac:= (Prompter prompt: 'Ingrese el DNI del paciente' caption:'Menú administrador > Registro > Intervención de paciente').].
+	pac:= (self existeDNI: pac).
+
 	espe:= Prompter prompt: 'Ingrese la especialidad.' caption:'Menú administrador > Registro > Intervención de paciente'.
 	[self existeEspecialidad: espe ] whileFalse: [
-		MessageBox errorMsg: 'Los datos ingresados no coinciden con nuestros registros. Vuelva a intentarlo.' caption:'Menú administrador > Registro > Intervención de paciente'.
-		espe:= Prompter prompt: 'Ingrese la especialidad.' caption:'Menú administrador > Registro > Intervención de paciente'.
+		MessageBox warning: ('Los datos ingresados no coinciden con nuestros registros. Vuelva a intentarlo.') caption:'Menú administrador > Registro > Intervención de paciente'.
+		espe:= Prompter prompt:'Ingrese la especialidad.' caption:'Menú administrador > Registro > Intervención de paciente'.
+		self existeEspecialidad: espe.
 	].
 	MessageBox notify:(self medicosDisponibles: espe y: 1).
 	matricula:= Prompter prompt: 'Ingrese la matrícula del profesional' caption:'Menú administrador > Registro > Intervención de paciente'.
-	[self validarMedico: matricula y: espe] whileFalse: [
+	[(self validarMedico: matricula y: espe) ~= false] whileFalse: [
 		MessageBox warning:('La matrícula ingresada no coincide con nuestros registros. Vuelva a intentarlo.') caption:'Menú administrador > Registro > Intervención de paciente'.
 		MessageBox notify:(self medicosDisponibles: espe y: 1).
-		matricula:= Prompter prompt: 'Ingrese la matrícula del profesional.' caption:'Menú administrador > Registro > Intervención de paciente'.
-	].
+		matricula:= Prompter prompt: 'Ingrese la matrícula del profesional.' caption:'Menú administrador > Registro > Intervención de paciente'.].
+	matricula:= (self validarMedico: matricula y: espe).
+
 	MessageBox notify:(self intervencionesDisponibles: espe).
 	inter:= Prompter prompt: 'Ingrese el código de intervención' caption:'Menú administrador > Registro > Intervención de paciente'.
-	[self validarIntervencion: inter y: espe] whileFalse: [
+	[(self validarIntervencion: inter y: espe) ~= false] whileFalse: [
 		MessageBox warning:('El código de intervención ingresado no coincide con nuestros registros. Vuelva a intentarlo.') caption:'Menú administrador > Registro > Intervención de paciente'.
 		MessageBox notify:(self intervencionesDisponibles: espe).
-		espe:= Prompter prompt: 'Ingrese el código de intervención' caption:'Menú administrador > Registro > Intervención de paciente'.
-	].
+		inter:= Prompter prompt: 'Ingrese el código de intervención' caption:'Menú administrador > Registro > Intervención de paciente'.].
+	inter:= (self validarIntervencion: inter y: espe).
 	
+	"Agregar en pac matricula y inter, el objeto completo."
         p:= IntervencionRegistrada new.
-        p cargaDatos: fecha y: pac y:matricula y: inter y: (MessageBox confirm: '¿Está pagada?' ).
+        p cargaDatos: fecha y: pac y: matricula y: inter y: (MessageBox confirm: '¿Está pagada?' ).
         intervencionPaciente add: p.
         rta:= MessageBox confirm: '¿Desea registrar otra intervención?' caption:'Menú administrador > Registro > Intervención de paciente'
     ]]].
@@ -754,12 +752,12 @@ registrarPaciente
 "Se registra un paciente validando todos los datos correspondientes"
 
 |rta p dni|
-
+	
 rta:= true.
 
 [rta] whileTrue: [
     dni := (Prompter prompt: 'Ingrese DNI' caption:'Menú administrador > Registro > Paciente').
-    (self existeDNI: dni) ifTrue: [
+    ((self existeDNI: dni) ~= false) ifTrue: [
         MessageBox warning: 'El DNI ya existe. Por favor, ingrese otro.' caption:'Menú administrador > Registro > Paciente'.
     ] ifFalse: [
         p:= Paciente new.
@@ -770,21 +768,17 @@ rta:= true.
 
 validarIntervencion: unCodigo y: unaEspec
 "Valida que exista una intervención con el código y especialidad mandados como parámetros"
-| m cod inter|
-cod:= unCodigo.
-m:= intervencion detect:[:i | i codigo=unCodigo and: [i especialidad=unaEspec] ] ifNone:[m:= 'no'.].
-(m='no') ifTrue: [^false] ifFalse: [^true ]!
+| Inter |
+Inter:= intervencion detect:[:i | i codigo=unCodigo and: [i especialidad=unaEspec] ] ifNone:[Inter:= 'none'.].
+(Inter = 'none') ifTrue: [^false] ifFalse: [^Inter].!
 
 validarMedico: unaMatricula y: unaEspecialidad 
 "Valida que exista un médico en la colección teniendo en cuenta su matrícula, especialidad y condición"
 
-| m med int|
-med:= unaMatricula.
-int:=unaEspecialidad.
-m:= medico detect:[:i | i matricula=med and: [i especialidad=int and: [i condicion=true] ] ] ifNone:[m:= 'no'.].
-(m='no') ifTrue: [^false] ifFalse: [^true ]! !
+| Med |
+Med:= medico detect:[:i | i matricula=unaMatricula and: [i especialidad=unaEspecialidad and: [i condicion=true] ] ] ifNone:[Med:= 'none'.].
+(Med='none') ifTrue: [^false] ifFalse: [^Med ]! !
 !Sanatorio categoriesForMethods!
-buscarEnColeccion:y:!public! !
 calcDescuento:y:!public! !
 consulta!public! !
 consultaIntervencion!public! !
@@ -839,10 +833,10 @@ cargaAdicional
 "Permite ingresar el adicional de las Intervenciones de alta complejidad"
 
 |temp|
-(temp:=(Prompter prompt: 'Ingrese el adicional' caption: 'Intervenciones > Alta Complejidad')).
+(temp:=(Prompter prompt: 'Ingrese el adicional' caption:'Intervenciones > Alta complejidad')).
 [((super esFlotante: temp)=false)] whileTrue: [
-	MessageBox errorMsg: 'Debe ingresar un número'.
-	temp:=(Prompter prompt: 'Ingrese el adicional' caption: 'Intervenciones > Alta Complejidad').
+	MessageBox errorMsg: 'Debe ingresar un número' caption:'Intervenciones > Alta complejidad'.
+	temp:=(Prompter prompt: 'Ingrese el adicional' caption:'Intervenciones > Alta complejidad').
 	((super esFlotante: temp)).
 ].
 Adicional:=temp asNumber asFloat.!
