@@ -20,10 +20,10 @@ package globalAliases: (Set new
 	yourself).
 
 package setPrerequisites: #(
-	'..\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\Base\Dolphin'
-	'..\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\Base\Dolphin Legacy Date & Time'
-	'..\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\Base\Dolphin Message Box'
-	'..\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\MVP\Presenters\Prompters\Dolphin Prompter').
+	'..\..\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\Base\Dolphin'
+	'..\..\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\Base\Dolphin Legacy Date & Time'
+	'..\..\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\Base\Dolphin Message Box'
+	'..\..\Documents\Dolphin Smalltalk 7\Core\Object Arts\Dolphin\MVP\Presenters\Prompters\Dolphin Prompter').
 
 package!
 
@@ -495,9 +495,9 @@ estadoliquidacion: unDNI
 	coleccion2 := intervencionPaciente select:[:each | each datosPaciente dni = unDNI and:[each condicionPago = false]].
 	Transcript clear.
 	Transcript show: 'Paciente: ';show: pac nombre;show: ' ';show: pac apellido;show: '  Obra social:  '; show: pac obraSocial; cr.
-	Transcript show:'';show: 'Fecha';tab; show: '      Descripcion         ';show: ' Medico   ';tab; show: '       Mat.   '; show: 'Importe'; cr.
+	Transcript show:'';show: 'Fecha';tab; show: '      Descripcion         ';show: ' Medico     '; show: '  Mat.   '; show: 'Importe'; cr.
         coleccion2 do: [:each |	
-            Transcript show: each fecha;show: '    '; show: each datosIntervencion descripcion;show: '   ' ;show: each datosMedico nombre;show:' ';show: each datosMedico apellido;show: '   '; show: each datosMedico matricula;show: '   ';show:'  ';show: '$'; print: each datosIntervencion arancel; tab; tab;
+            Transcript show: each fecha;show: '    '; show: each datosIntervencion descripcion;show: '   ' ;show: each datosMedico nombre;show:' ';show: each datosMedico apellido;show: '   '; show: each datosMedico matricula;show: ' ';show:' ';show: '$'; print: each datosIntervencion arancel; tab; tab;
                 cr.
 	((each datosIntervencion) isKindOf: AltaComplejidad) ifTrue: [total:= total + ((each datosIntervencion arancel) * (1+ (AltaComplejidad adicional / 100))). acumAdic:= (((each datosIntervencion arancel) * (1+ (AltaComplejidad adicional / 100)))- each datosIntervencion arancel) + acumAdic ] ifFalse: [total:= total + (each datosIntervencion arancel)]
         ].
@@ -561,8 +561,8 @@ coleccion := intervencion select: [:each | each especialidad=unaEspecialidad].
 	Transcript show: 'CÓDIGO'; tab;tab; show:'DESCRIPCIÓN';tab;tab;show:'ARANCEL'; cr.
         coleccion do: [:each | 
             Transcript 
-                show: each codigo; tab;tab;
-		show: each descripcion; tab;tab;
+                print: each codigo; tab;tab;
+		show: each descripcion; tab;tab;tab;
 		show: each arancel printString; tab;tab;
                 cr.
         ].
@@ -685,7 +685,7 @@ rta:= true.
 registrarIntervencionPaciente
 "Se registra una intervención de paciente, validando todos los datos correspondientes."
 
-|rta p fecha inter matricula pac espe temp|
+|rta p fecha inter matricula pac espe|
 
 rta:= true.
 (paciente isEmpty or: [intervencion isEmpty or: [medico isEmpty]]) ifTrue: [MessageBox errorMsg: 'BASE DE DATOS VACIA.' caption: 'Error del sistema'] ifFalse: [
@@ -715,11 +715,11 @@ rta:= true.
 	matricula:= (self validarMedico: matricula y: espe).
 
 	MessageBox notify:(self intervencionesDisponibles: espe).
-	inter:= Prompter prompt: 'Ingrese el código de intervención' caption:'Menú administrador > Registro > Intervención de paciente'.
+	inter:= (Prompter prompt: 'Ingrese el código de intervención' caption:'Menú administrador > Registro > Intervención de paciente') asNumber.
 	[(self validarIntervencion: inter y: espe) ~= false] whileFalse: [
 		MessageBox warning:('El código de intervención ingresado no coincide con nuestros registros. Vuelva a intentarlo.') caption:'Menú administrador > Registro > Intervención de paciente'.
 		MessageBox notify:(self intervencionesDisponibles: espe).
-		inter:= Prompter prompt: 'Ingrese el código de intervención' caption:'Menú administrador > Registro > Intervención de paciente'.].
+		inter:= (Prompter prompt: 'Ingrese el código de intervención' caption:'Menú administrador > Registro > Intervención de paciente') asNumber].
 	inter:= (self validarIntervencion: inter y: espe).
 	
 	"Agregar en pac matricula y inter, el objeto completo."
